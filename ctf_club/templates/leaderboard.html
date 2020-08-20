@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+	<main class="container-lg">
+	<div class="row mt-2 mb-2">
+		<div class="col-11 text-center">
+			<h1> Leaderboard </h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-10">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+					<td class="text-center font-weight-bold w-15">
+						Rank
+					</td>
+					<td class="text-center font-weight-bold w-70">
+						Username
+					</td>
+					<td class="text-center font-weight bold w-15">
+						Points
+					</td>
+					</tr>
+				</thead>
+				<tbody id="leaderboard">
+				{% for rank in ranks %}
+					{% for user in rank.users %}
+						<tr>
+							<td class="text-center font-weight-bold f-125 w-15"><span class="font-weight-bold">{{ forloop.parentloop.counter }}</span></td>
+							<td class="text-center font-weight-bold f-125 w-70"><a href="{% url 'control_panel' user.username %}"> {{ user.username }}</a></td>
+						<td class="text-center f-125 w-15">
+							{{ user.points }}
+						</td>
+						</tr>
+					{% endfor %}
+
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	</main>
+{% endblock %}
