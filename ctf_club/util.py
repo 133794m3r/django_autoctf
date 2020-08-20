@@ -2,7 +2,7 @@
 from random import randint
 
 # RSA Flags
-from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod
+from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod,make_additional_pairs
 # Classical Ciphers
 from .libctf import make_hill, make_affine
 from .libctf import make_masterhacker, make_fizzbuzz
@@ -35,6 +35,7 @@ CHALLENGE_FUNCS = {
 	"affine":make_affine,
 	"common_mod":make_common_mod,
 	"master_hacker":make_masterhacker,
+	"additional_pairs":make_additional_pairs,
 }
 
 CATEGORIES = ["Classical Crypto","Modern Crypto","Programming"]

@@ -131,14 +131,18 @@ def logout_view(request):
 #@login_required(login_url="login")
 # @ratelimit(key='user',rate='45/m')
 def challenge_view(request,challenge_id):
+	files = None
 	if request.user.is_authenticated:
 		solved = False if Solves.objects.filter(user_id=request.user.id,challenge_id=challenge_id).count() == 0 else True
 
 	#If they've already solved it might as well show them the flag.
 		if solved:
-			chal = Challenges.objects.values('id','name','description','points','flag').get(id=challenge_id)
+			chal = Challenges.objects.values('id','name','description','points','flag',"files_filename").get(id=challenge_id)
 		else:
-			chal = Challenges.objects.values('id', 'name', 'description', 'points').get(id=challenge_id)
+			chal = Challenges.objects.values('id', 'name', 'description', 'points',"files__filename").get(id=challenge_id)
+		#a hack to get files by the proper name.
+		chal["files"] = [chal["files__filename"]] if type(chal["files__filename"]) is str else chal["files__filename"]
+		chal.pop("files__filename")
 
 	else:
 		solved = False
@@ -146,10 +150,9 @@ def challenge_view(request,challenge_id):
 
 	hints = Hints.objects.filter(challenge_id=chal['id']).values('id','level')
 	num_hints = hints.count()
-
 	chal = jsonify_queryset(chal)
 	hints = jsonify_queryset(hints)
-	resp = {'challenge': chal, 'hints': hints,'num_hints':num_hints,'solved':solved,'authed':request.user.is_authenticated}
+	resp = {'challenge': chal, 'hints': hints, 'num_hints':num_hints,'solved':solved,'authed':request.user.is_authenticated}
 	return JsonResponse(resp)
 
 
@@ -374,8 +377,12 @@ def challenge_admin(request):
 			minimum = content['min']
 			maximum = content['max']
 			description,flag = CHALLENGE_FUNCS[content['sn']](minimum, maximum)
-		elif content['sn'] == 'master_hacker':
-			description, flag, files = CHALLENGE_FUNCS[content['sn']]()
+		elif category == "Programming":
+			chal_index = CHALLENGES_TEMPLATES_NAMES[name][1]
+			if CHALLENGES_TEMPLATES[chal_index]['files']:
+				description, flag, files = CHALLENGE_FUNCS[content['sn']]()
+			else:
+				description,flag = CHALLENGE_FUNCS[content['sn']]()
 		else:
 			plaintext = content['plaintext']
 			if content['sn'] in ["affine","hill"]:
@@ -632,7 +639,7 @@ def captcha(request):
 
 @login_required(login_url="login")
 def file(request,filename):
-	return FileResponse(open(f'file/{filename}','rb'))
+	return FileResponse(open(f'files/{filename}','rb'))
 
 
 # TFA related views.

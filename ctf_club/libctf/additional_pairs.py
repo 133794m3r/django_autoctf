@@ -4,7 +4,6 @@ def find_index(the_list, value, start_index=0):
 	the_list_len = len(the_list)
 	for i in range(start_index, the_list_len):
 		if the_list[i] == value:
-			index = i
 			break
 	else:
 		return -1
@@ -30,12 +29,11 @@ def trim_the_array(the_list, max_value):
 
 
 def find_first_pair(array, chosen_sum, length=None):
-	if length == None:
+	if length is None:
 		next_item = len(array) - 1
 	else:
 		next_item = length - 1
 	prev_item = 0
-	working_sum = 0;
 	while next_item > prev_item:
 		working_sum = array[prev_item] + array[next_item]
 		if working_sum == chosen_sum:
@@ -55,12 +53,8 @@ def find_first_pair(array, chosen_sum, length=None):
 def check_for_pairs(the_list, chosen_sum):
 	found = False
 	the_list_len = len(the_list)
-	diff = 0
-	i = 0;
-	current_value = 0;
-	found_index = 0;
 	number_of_pairs = 0
-	used_indicies = list();
+	used_indices = list()
 	pair_tuples = list()
 	number_of_searches = the_list_len
 	if len(the_list) < 1:
@@ -76,24 +70,25 @@ def check_for_pairs(the_list, chosen_sum):
 		found_index = find_index(the_list, diff, i)
 		number_of_searches += ((found_index - i) if found_index != -1 else (the_list_len - i))
 		if found_index != -1:
-			number_of_searches += len(used_indicies)
-			if found_index not in used_indicies:
-				used_indicies.append(found_index)
-				used_indicies.append(i)
+			number_of_searches += len(used_indices)
+			if found_index not in used_indices:
+				used_indices.append(found_index)
+				used_indices.append(i)
 				pair_tuples.append((the_list[found_index], the_list[i]))
 				number_of_pairs += 1
 
 	stringed = ''
-	fixup = stringed.maketrans('()', '{}');
+	fixup = stringed.maketrans('()', '{}')
 	stringed_pairs = ','.join(str(x).translate(fixup) for x in pair_tuples)
-	stringed_pairs = f"{number_of_pairs};{stringed_pairs}";
+	stringed_pairs = f"{number_of_pairs};{stringed_pairs}"
 	return stringed_pairs
 
 def make_additional_pairs(number_of_items=100):
 	random_list = [random.randint(-3,10) for _ in range(number_of_items)]
 	chosen_sum = random.randint(1,10)
 
-	with open("files/additional_pairs_list.csv","w") as fh:
+	#It's actually a CSV file but to make sure it's viewable in the browser I'm making it be a text file.
+	with open("files/additional_pairs_list.txt","w") as fh:
 		fh.write(','.join(str(_) for _ in random_list))
 
 	flag = check_for_pairs(random_list,chosen_sum)
@@ -108,4 +103,4 @@ def make_additional_pairs(number_of_items=100):
 <h3> Testcase </h3><p> Given the list of integers below find all pairs that add up to the number {testcase_chosen_sum}. <span class="text-mono">{random_list} </span> <br /> Thus the flag would then be <span class="text-mono"> {testcase_flag}</span></p>
 	"""
 
-	return desc,flag
+	return desc,flag,"additional_pairs_list.csv"
