@@ -2,7 +2,7 @@
 from random import randint
 
 # RSA Flags
-from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod,make_additional_pairs
+from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod,make_additional_pairs,make_orded_chars
 # Classical Ciphers
 from .libctf import make_hill, make_affine
 from .libctf import make_masterhacker, make_fizzbuzz
@@ -36,6 +36,7 @@ CHALLENGE_FUNCS = {
 	"common_mod":make_common_mod,
 	"master_hacker":make_masterhacker,
 	"additional_pairs":make_additional_pairs,
+	"ordered_chars":make_orded_chars,
 }
 
 CATEGORIES = ["Classical Crypto","Modern Crypto","Programming"]
@@ -78,6 +79,9 @@ CHALLENGES_TEMPLATES = [
 	{"name": "Additional Pair Master", "sn": "additional_pairs", "category": "Programming",
 	 "description": "This challenge is an interview style question where the user has to find all pairs of integers in a list that add up to some number. It is one I got from a list done at Google.",
 	 "points": 140, "variety": False, "files": True},
+	{"name": "You are out of Order!", "sn": "ordered_chars", "category": "Programming",
+	 "description": "This challenge requires the user to go through a list of alphabetical characters and get the sum of the code points.",
+	 "points": 90, "variety": False, "files": True},
 ]
 
 
