@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
+from ctf_club.util import jsonify_queryset
+
 """
 CTFClub Project
 By Macarthur Inbody <admin-contact@transcendental.us>
@@ -10,12 +12,15 @@ Licensed AGPLv3 Or later (2020)
 
 # User model is just here so I can reference it, I use the default model.
 class User(AbstractUser):
+	points = models.IntegerField(default=0)
+	tfa_enabled = models.BooleanField(default=False)
+	tfa_secret = models.CharField(max_length=32,default=None)
 	def to_dict(self):
 		return {'id':self.id, 'username':self.username, 'email':self.email,
-		        'is_staff':self.is_staff, 'is_superuser':self.is_superuser,
-		        'first_name':self.first_name, 'last_name':self.last_name,
-		        'date_joined':self.date_joined, 'is_active':self.is_active,
-		        'last_login':self.last_login
+				'is_staff':self.is_staff, 'is_superuser':self.is_superuser,
+				'first_name':self.first_name, 'last_name':self.last_name,
+				'date_joined':self.date_joined, 'is_active':self.is_active,
+				'last_login':self.last_login
 		}
 
 
@@ -34,6 +39,23 @@ class Categories(models.Model):
 	def __len__(self):
 		return 1
 
+
+class Files(models.Model):
+	filename = models.TextField()
+
+	def __len__(self):
+		return 1
+
+	def __repr__(self):
+		return 'Files(id={!r},filename={!r})'.format(self.id,self.filename)
+
+	def __str__(self):
+		return self.__repr__()
+
+	def to_dict(self):
+		#__challenge = self.challenge.to_dict()
+		return {'id':self.id,'filename':self.filename}
+
 class Challenges(models.Model):
 	category = models.ForeignKey('Categories',on_delete=models.CASCADE,related_name='category')
 	points = models.IntegerField()
@@ -42,9 +64,10 @@ class Challenges(models.Model):
 	flag = models.TextField()
 	timestamp = models.DateTimeField(default=timezone.now)
 	num_solves = models.IntegerField(default=0)
+	files = models.ManyToManyField(Files)
 
 	def __repr__(self):
-		return 'Challenges(id={!r},category={!r},points={!r},name={!r},description={!r},flag={!r},timestamp={!r},num_solves={!r}'.format(self.id,self.category,self.points,self.name,self.description,self.flag,self.timestamp,self.num_solves)
+		return 'Challenges(id={!r},category={!r},points={!r},name={!r},description={!r},flag={!r},timestamp={!r},num_solves={!r},files={!r}'.format(self.id,self.category,self.points,self.name,self.description,self.flag,self.timestamp,self.num_solves,self.files)
 
 	def __str__(self):
 		return self.__repr__()
@@ -55,10 +78,11 @@ class Challenges(models.Model):
 
 		:return: {dict} A dict containing the fields that are important.
 		"""
-		return {'id':self.id,'category':self.category.name,'name':self.name,'points':self.points,'description':self.description,'flag':self.flag,'timestamp':self.timestamp,'num_solves':self.num_solves}
+		return {'id':self.id,'category':self.category.name,'name':self.name,'points':self.points,'description':self.description,'flag':self.flag,'timestamp':self.timestamp,'num_solves':self.num_solves,'files':jsonify_queryset(self.files.all())}
 
 	def __len__(self):
 		return 1
+
 
 class Solves(models.Model):
 	challenge = models.ForeignKey('Challenges',on_delete=models.CASCADE,related_name='solves')
@@ -68,16 +92,13 @@ class Solves(models.Model):
 	def to_dict(self):
 		__chal = self.challenge.to_dict()
 		__user = self.user.to_dict()
-		return {'challenge_id':__chal['id'],'challenge_name':__chal['name'],'challenge_category':__chal['category'],'challenge_flag':__chal['flag'],'username':__user['username']}
-
+		return {'challenge_id':__chal['id'],'challenge_name':__chal['name'],'challenge_category':__chal['category'],'challenge_flag':__chal['flag'],'challenge_points':__chal['points'],'username':__user['username']}
 
 	def __repr__(self):
-		return 'Solves(challenge={!r},user={!r},timestamp={!r})'.format(self.challenge,self.user,self.timestamp)
-
+		return 'Solves(id={!r},challenge={!r},user={!r},timestamp={!r})'.format(self.id,self.challenge,self.user,self.timestamp)
 
 	def __str__(self):
 		return self.__repr__()
-
 
 	def __len__(self):
 		return 1
@@ -95,22 +116,6 @@ class Solves(models.Model):
 # 	def __repr__(self):
 # 		return 'TotalSolves(challenge={!r},num_solves={!r}'.format(self.challenge,self.num_solves)
 
-class Files(models.Model):
-	filename = models.TextField()
-	challenge = models.ForeignKey('Challenges',on_delete=models.CASCADE,related_name='files')
-
-	def __len__(self):
-		return 1
-
-	def __repr__(self):
-		return 'Files(filename={!r},challenge={!r})'.format(self.filename,self.challenge)
-
-	def __str__(self):
-		return self.__repr__()
-
-	def to_dict(self):
-		__challenge = self.challenge.to_dict()
-		return {'id':self.id,'filname':self.filename,'challenge':self.challenge.name}
 
 # Unbelievably unperformant way of using this but oh well.
 # Better way may be to have multiple tables so that I can avoid full table scans as it is a many-to-many
@@ -123,7 +128,7 @@ class HintsUnlocked(models.Model):
 		return 1
 
 	def __repr__(self):
-		return "HintsUnlocked(user={!r},Hint={!r})".format(self.user,self.hint)
+		return "HintsUnlocked(id={!r},user={!r},Hint={!r})".format(self.id,self.user,self.hint)
 
 	def __str__(self):
 		return self.__repr__()
@@ -140,7 +145,7 @@ class Hints(models.Model):
 	timestamp = models.DateTimeField(default=timezone.now)
 
 	def __repr__(self):
-		return 'Hints(challenge={!r},description={!r},level={!r},timestamp={!r}'.format(self.challenge,self.description,self.level,self.timestamp)
+		return 'Hints(id={!r},challenge={!r},description={!r},level={!r},timestamp={!r}'.format(self.id,self.challenge,self.description,self.level,self.timestamp)
 
 	def __str__(self):
 		return self.__repr__()
@@ -150,3 +155,17 @@ class Hints(models.Model):
 
 	def to_dict(self):
 		return {'id':self.id,'challenge_name':self.challenge.name,'description':self.description,'level':self.level}
+
+from ratelimitbackend.backends import RateLimitModelBackend
+
+class MyBackend(RateLimitModelBackend):
+	minutes = 5
+	requests = 10
+
+	def key(self, request, dt):
+		return '%s%s-%s-%s' % (
+			self.cache_prefix,
+			self.get_ip(request),
+			request.POST['username'],
+			dt.strftime('%Y%m%d%H%M'),
+		)

@@ -1,5 +1,3 @@
-import random
-import re
 from .crypt_math import *
 """
 Crypto Lab Library - Hill Module
@@ -36,7 +34,7 @@ def matrix_to_list_string(input_str,input_str_len):
 
 
 def hill_decrypt(input_str,key):
-	decryption_key=matrix_inv(key,26)
+	decryption_key= matrix_inv(key, 26)
 	#Encryption and decryption are the same with just the key being different.
 	return hill_encrypt(input_str,decryption_key)
 
@@ -49,7 +47,7 @@ def hill_encrypt(input_str,key):
 	pt=fill_matrix(pt,numeric,input_str_matrices)
 
 	for i in range(input_str_matrices):
-		ct[i]=matrix_mul(key,pt[i],26)
+		ct[i]= matrix_mul(key, pt[i], 26)
 
 	return matrix_to_list_string(ct,input_str_matrices)
 
@@ -58,10 +56,10 @@ def generate_random_key(modulus):
 	key=[[0,0],[0,0]]
 	maximum = modulus -1
 	while gcd != 1:
-		a=random.randint(0,maximum)
-		b=random.randint(0,maximum)
-		c=random.randint(0,maximum)
-		d=random.randint(0,maximum)
+		a=randint(0,maximum)
+		b=randint(0,maximum)
+		c=randint(0,maximum)
+		d=randint(0,maximum)
 		key[0][0]=a
 		key[0][1]=b
 		key[1][0]=c

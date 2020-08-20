@@ -13,7 +13,7 @@
 /**
  * modal_challenge
  *
- * @param event {event} The event sent to it.
+ * @param event {Event} The event sent to it.
  * @param challenge_type {string} The challenge's short name.
  * @param edit {boolean} Whether this challenge already exists and should be an edit version.
  */
@@ -46,10 +46,14 @@ function modal_challenge(event,challenge_type,edit){
 				<input type="number" name="max" id="max" min="1201" max="3000" class="input_items numbers"/>
 			</div>
 		</div>`;
+		 flag = chal.flag;
+		 if(flag !== ''){
+		 	full_description = chal.full_description + `<p>The flag was ${flag}.</p>`
+		 }
 		break;
 
 		 default:
-			flag = CHALLENGES[challenge_type].flag;
+			flag = chal.flag;
 			let variety = 0;
 			if ((challenge_type === 'hill' || challenge_type === 'affine')){
 				challenge_name+=' - 0';
@@ -61,7 +65,7 @@ function modal_challenge(event,challenge_type,edit){
 			}
 			document.getElementById('submit_chal').disabled = true;
 
-			flag = flag ? flag : ''
+			flag = flag ? flag : '';
 			inner_content = `<div class="col-lg-7 col-md-8 col-sm-9 form-group">
 				<textarea id='plain_text' name='plain_text' class="input_items form-text w-100" rows="2" cols="40" onkeyup="check_len('plain_text','submit_chal')">${flag}</textarea>
 			</div>`;
@@ -76,31 +80,48 @@ function modal_challenge(event,challenge_type,edit){
 	const el = document.getElementById('input_description');
 	if (edit === true) {
 		const fd = document.getElementById('full_description');
-		if(full_description == ''){
+		if (full_description === '') {
 			full_description = chal.full_description;
 		}
-		 fd.innerHTML = `<p>For reference, the old challenge is below here.</p>`+full_description;
-		 //+`<pre>Flag: ${flag}</pre>`;
-
-		let el2 = document.getElementById('submit_chal');
+		fd.innerHTML = `<p>For reference, the old challenge is below here.</p>` + full_description;
+		//+`<pre>Flag: ${flag}</pre>`;
+		let el2;
+		el2 = document.getElementById('submit_chal');
 		el2.disabled = false;
-		el2.setAttribute('aria-disabled',"false");
-		el2=document.getElementById('manage_challenge_hint');
+		el2.setAttribute('aria-disabled', "false");
+		el2 = document.getElementById('manage_challenge_hint');
 		el2.hidden = false;
 		el2.disabled = false;
-		el2.setAttribute('aria-hidden',"false");
+		el2.setAttribute('aria-hidden', "false");
+
+		if (chal.can_have_files) {
+			console.log(chal);
+			let cols = '<div class="row mb-2"><div class="col-12 text-center mt-3"><h2>Files</h2></div>'
+
+			for (let i = 0; i < chal.files.length; i++) {
+				cols += `<div class='col-12 text-center mt-3'><a href="/files/${chal.files[i].filename}" class="btn btn-primary" target="_blank">${chal.files[i].filename}</a></div>`
+			}
+			cols += '</div>'
+			document.getElementById('full_description').insertAdjacentHTML('beforeend', cols);
+		}
+
+
+		if (chal.type === 'Programming') {
+			document.getElementById('submit_chal').disabled = false;
+			document.getElementById('plain_text').innerText = "This Programming Challenge takes no input."
+			document.getElementById('plain_text').setAttribute('readonly', 'true');
+		}
 	}
 	else{
-		document.getElementById('full_description').innerHTML = ''
-
-		let el2 = document.getElementById('submit_chal');
-		el2.disabled = (challenge_type !== 'fizzbuzz');
+		let el2;
+		el2 = document.getElementById('submit_chal');
+		el2.disabled = (chal.category !== 'Programming');
 		el2.setAttribute('aria-disabled',"true");
 		el2=document.getElementById('manage_challenge_hint');
 		el2.hidden = true;
 		el2.disabled = true;
 		el2.setAttribute('aria-hidden',"true");
-
+		document.getElementById('full_description').innerHTML = ''
 	}
 	document.getElementById('manage_challenge_hint').dataset.sn = challenge_type
 	el.innerHTML = `<span>${chal.description}</span>`;
@@ -115,21 +136,19 @@ function modal_challenge(event,challenge_type,edit){
 /**
  * modal_hint
  * this sets up the modal for the hint that you're editing at the time.
- * 
- * @param {element} The element that we're calling this from, as in what activated it.
- * @param {edit} Whether we're editing a hint or adding a new one, defaults to true as that's the default case.
  *
+ * @param element {HTMLElement} The element we're working with.
+ * @param edit {boolean} Whether we're editing the element.
  */
 function modal_hint(element,edit=true){
-	const hint_id = element.dataset.id;
+	const hint_id = parseInt(element.dataset.id);
 	document.getElementById('add_hint_modal').dataset.backdrop = 'static';
-	document.getElementById('add_hint_modal_title').innerText = (hint_id != 0) ? "Edit Hint" : "Add Hint";
+	document.getElementById('add_hint_modal_title').innerText = (hint_id !== 0) ? "Edit Hint" : "Add Hint";
 	document.getElementById("hint_challenge_name").value = element.dataset.cn;
-	document.getElementById('submit_hint').innerText = (hint_id != 0) ? "Edit Hint" : "Add Hint";
-	document.getElementById('submit_hint').disabled = (hint_id == 0)
+	document.getElementById('submit_hint').innerText = (hint_id !== 0) ? "Edit Hint" : "Add Hint";
+	document.getElementById('submit_hint').disabled = (hint_id === 0)
 	if(edit) {
-		const hint_desc = document.getElementById(`${hint_id}-desc`).innerHTML;
-		document.getElementById("hint_description").value = hint_desc;
+		document.getElementById("hint_description").value = document.getElementById(`${hint_id}-desc`).innerHTML;
 		document.getElementById('hint_id').value = hint_id;
 		document.getElementById('hint_level').value = element.dataset.lvl;
 	}
@@ -143,12 +162,12 @@ function modal_hint(element,edit=true){
 
 /**
  *
- * check_len 
+ * check_len
  * This function checks the length of an input field(specified), and disables the button to submit
  * it if the length is zero.
- * 
- * @param {input_id} the id of the input field we're checking.
- * @param {button_id} The id of the button we're going to disable or enable.
+ *
+ * @param input_id {string} The ID of the inputs we're checking.
+ * @param button_id {string} The button we're going to e disabling or enabling.
  */
 function check_len(input_id,button_id){
 	const len = document.getElementById(input_id).value.length;
@@ -165,7 +184,7 @@ function submit_hint(){
 	const hint_level = parseInt(document.getElementById("hint_level").value);
 	const hint_description = document.getElementById("hint_description").value;
 	const challenge_name = document.getElementById("hint_challenge_name").value;
-	if(hint_description.length === 0 || isNaN(hint_level) || challenge_name.length == 0 ){
+	if(hint_description.length === 0 || isNaN(hint_level) || challenge_name.length === 0 ){
 		return;
 	}
 	hint_id = (isNaN(hint_id))?0:hint_id;
@@ -177,7 +196,7 @@ function submit_hint(){
 	content['level'] = hint_level;
 
 	submit(`/admin/challenge/hints/${challenge_name}/`,content,resp=>{
-		if(hint_id == 0){
+		if(hint_id === 0){
 			content= `<tr><td id="${hint_id}-desc">${hint_description}</td><td><a href="#" data-id="${hint_id}" 
 				data-lvl="${hint_level}" data-cn="${challenge_name}" class="edit_hint">Edit</a></td></tr>`;
 			//Should do this with plain-ol javascript but oh well this works for now.
@@ -205,7 +224,6 @@ function submit_challenge(){
 
 	if(chal.variety){
 		content['variety'] = parseInt(document.getElementById('variety').value);
-		document.getElementById('hint_modal_title').innerText = `${resp.hints.challenge_name} : Hints`
 		//Points are adjusted based upon the variety value. Where the point bonus is basically 1+(0.33*(variety)). Also
 		//I make sure that it's a nice even round number by making sure it ends in either a 5 or a zero.
 		points = Math.ceil(chal.points *(1+(content['variety']/3)))
@@ -218,7 +236,7 @@ function submit_challenge(){
 		content['min'] = (min < 2 || min > 1200)?undefined:min
 		content['max'] = (max < 1201 || max > 3000)?undefined:max
 	}
-	else{
+	else if(chal.category !== "Programming"){
 		content['plaintext'] = document.getElementById('plain_text').value;
 		if(content['plaintext'].length === 0 ){
 			return;
@@ -230,16 +248,31 @@ function submit_challenge(){
 		//Eventually I'll actually use this data to update the local challenge data but that's not for now.
 		// It's for a later thing. For now I just log the response. In the end I'll actually use the response to edit the
 		// cached values.
+
 		let variety = content['variety'] || -1;
 		if(variety === -1){
+			console.log(variety);
+			console.log(content['edit']);
+			if(!content['edit']) {
+				document.getElementById(sn).innerHTML = `<button class="btn btn-primary manage_hints mr-1" data-sn="${sn}" data-edit="true" id="hint-${sn}">Manage Hints</button>
+			<button class="btn btn-primary make_challenge ml-1" data-sn="${sn}" data-edit="true" id="chal-${sn}">Edit Challenge</button>`;
+				document.getElementById(`chal-${sn}`).addEventListener('click',event=>{
+				  	modal_challenge(event,sn, true);
+				})
+				document.getElementById(`hint-${sn}`).addEventListener('click',event=>{
+				  	fetch_challenge_hints(sn);
+				})
+			}
 			CHALLENGES[sn].flag = response.flag;
-			CHALLENGES[sn].description = response.description;
+			CHALLENGES[sn].full_description = response.description;
+		}
+		if(response.file !== undefined){
+			CHALLENGES[sn].file = [response.file];
 		}
 		set_challenge_info(response,sn,variety);
 
 	})
 }
-
 
 /**
  *
@@ -247,14 +280,15 @@ function submit_challenge(){
  * @param variety {number} The variety.
  * @returns {object} Will return the object with the various fields I need to get.
  */
-function get_challenge_info(challenge_type,variety=0){
+function get_challenge_info(challenge_type,variety=-1){
 	let tmp = {}
 	let chal = {}
+
 	for(let challenge in FULL_CHALLENGES){
 		chal = FULL_CHALLENGES[challenge];
-		if(chal.variety && chal.sn === challenge_type){
+		if(chal.variety !== false && chal.sn === challenge_type){
 			//only call this if a variety is set and the shortname is the same as the one we're trying to get.
-			if(chal.variety == variety) {
+			if(chal.variety === variety) {
 				tmp['full_description'] = chal.full_description;
 				tmp['flag'] = chal.flag;
 				tmp['variety'] = chal.variety;
@@ -263,6 +297,7 @@ function get_challenge_info(challenge_type,variety=0){
 			}
 		}
 	}
+	tmp['variety'] = undefined
 	return tmp
 }
 
@@ -273,9 +308,9 @@ function get_challenge_info(challenge_type,variety=0){
  * from creating a new flag so that we have an up-to-date version of the data
  * in the local caches.
  * 
- * @param {new_info} the object we're going to replace it with
- * @param {challenge_type} the challenge's shortname
- * @param {variety} The variety of the challenge. -1 means it has none. This is used for challenges that are part of a series.
+ * @param new_info {object} the object we're going to replace it with
+ * @param challenge_type {string} the challenge's shortname
+ * @param variety {number} The variety of the challenge. -1 means it has none. This is used for challenges that are part of a series.
  * 
  */
 function set_challenge_info(new_info,challenge_type,variety = -1){
@@ -311,12 +346,12 @@ function set_challenge_info(new_info,challenge_type,variety = -1){
  * fetch_challenge_hints
  * Fetches all hints for a particular challenge based upon it's name.
  *
- * @param {name} The challenge's shortname(or shorthand basically it's category)
- * @param {full} Wether or not all varities have been utilized.
+ * @param name {string} The challenge's shortname(or shorthand basically it's category)
+ * @param full {boolean} Whether or not all varieties have been utilized.
  *
  */
 function fetch_challenge_hints(name,full=false){
-	let challenge_name = name
+	let challenge_name
 	if(full === false) {
 		if (CHALLENGES[name].variety) {
 			challenge_name = `${CHALLENGES[name].name} - 0`
@@ -326,17 +361,24 @@ function fetch_challenge_hints(name,full=false){
 		}
 	}
 	else{
-		challenge_name = CHALLENGES[name].name;
+
+		if(CHALLENGES[name].variety){
+			const variety = document.getElementById('variety').value;
+			challenge_name = `${CHALLENGES[name].name} - ${variety}`;
+		}
+		else {
+			challenge_name = CHALLENGES[name].name;
+		}
 	}
-	challenge_name = encodeURI(challenge_name);
-	get(`/admin/challenge/hints/${challenge_name}/`,resp=>{
+	let challenge_name_enc = encodeURI(challenge_name);
+	get(`/admin/challenge/hints/${challenge_name_enc}/`,resp=>{
 		console.log(resp);
-		const len = resp.len;
+		const len = parseInt(resp.len);
 		let content = ''
-		if(len == 0){
+		document.getElementById('hint_modal_title').innerText = `${challenge_name} : Hints`;
+		if(len === 0){
 			name = CHALLENGES[name].name;
-			document.getElementById('hint_modal_title').innerText = `${name} : Hints`;
-			document.getElementById('add_hint').dataset.cn = name;
+			document.getElementById('add_hint').dataset.cn = challenge_name;
 		}
 		else if(len === 1){
 			document.getElementById('add_hint').dataset.cn = resp.hints.challenge_name;
@@ -377,13 +419,13 @@ function fetch_challenge_hints(name,full=false){
  */
 function change_variety(){
 	let sn = document.getElementById('sn').value;
-	let variety = document.getElementById('variety').value
+	let variety = parseInt(document.getElementById('variety').value)
 	let title = document.getElementById('challenge_modal_title').innerText
 	title = title.slice(0,-1);
 	title = title + variety;
 	document.getElementById('challenge_modal_title').innerText = title;
 	let tmp = get_challenge_info(sn,variety);
-	if(tmp.variety) {
+	if(tmp.variety !== undefined) {
 		document.getElementById('editing').checked = true
 		document.getElementById('full_description').innerHTML = `For reference, the old challenge is below here.<br /><br />${tmp.full_description}`;
 		document.getElementById('plain_text').value = tmp.flag;

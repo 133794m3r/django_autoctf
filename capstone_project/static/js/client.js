@@ -4,6 +4,13 @@
  * Licensed under AGPLv3 Or Later (2020)
  */
 
+/**
+ * Fetch Challenge Function
+ *
+ * Will fetch a challenge for you based upon it's id.
+ *
+ * @param {int} challenge_id
+ */
 function fetch_chal(challenge_id){
 	get(`/challenge/${challenge_id}`,resp=>{
 		console.log(resp);
@@ -45,7 +52,7 @@ function fetch_chal(challenge_id){
 
 		document.querySelectorAll('.hints').forEach(el=>{
 			el.addEventListener('click',event=>{
-				fetch_hint(el.dataset.id);
+				fetch_hint(parseInt(el.dataset.id));
 			});
 		});
 		$('#challenge_modal').modal('toggle');
@@ -53,6 +60,11 @@ function fetch_chal(challenge_id){
 }
 
 
+/**
+ * Gets the hint from the server.
+ *
+ * @param hint_id {int} The id of the hint.
+ */
 function fetch_hint(hint_id){
 	get(`/hint/${hint_id}`,resp=>{
 		document.getElementById('hint_body').innerHTML = resp.description;
@@ -60,18 +72,31 @@ function fetch_hint(hint_id){
 	});
 }
 
+
 function dismiss_alert(){
 
 }
+
+/**
+ *  The solver function.
+ *  This function will attempt your solve by submitting it to the server via
+ *  the fetch command. It will then give the response based upon the parsed JSON respone.
+ *
+ * @param event {object}
+ */
 function solve(event){
 	event.preventDefault();
 	const id = document.getElementById('challenge_id').value;
 	const answer = document.getElementById('answer').value;
 	submit(`/solve/${id}`,{'answer':answer},resp=>{
 		console.log(resp);
-		let msg = ''
-		let type = ''
-		if(resp.solved){
+		let msg;
+		let type;
+		if(resp.ratelimited){
+			msg = "Slow down you're trying too fast.";
+			type = 'alert-danger';
+		}
+		else if(resp.solved){
 			msg = "Solved!";
 			type = 'alert-success';
 		}
@@ -79,19 +104,32 @@ function solve(event){
 			msg = "Wrong Answer";
 			type = 'alert-danger';
 		}
-		let alert = `<div class="alert ${type} alert-dismissible fade show" role="alert"> ${msg}</div>`
-		document.getElementById('alert_msg').innerHTML = alert;
+		document.getElementById('alert_msg').innerHTML = `<div class="alert ${type} alert-dismissible fade show" role="alert" id="alert"> ${msg}</div>`;
+
+		// document.getElementById('challenge_body').scrollTop += 100
 		window.setTimeout(()=>{
-				$('.alert').alert('close');
+				$('#alert').alert('close');
+				// document.getElementById('challenge_body').scrollTop += 100
+				//window.scrollTop = old_top;
 		},3000);
 	});
 }
 
+/**
+ * This function will socre a user's password using ZXCVBN and will also include
+ * their username as part of it's inputs so that it has the best chance of trying
+ * to reduce the score of their password.
+ *
+ * @param button_el {string}
+ * @param username {string}
+ * @param password {string}
+ * @param password_confirm_id {string}
+ * @returns {Number}
+ */
 function score_password(button_el,username,password,password_confirm_id){
 	let inputs=new Array(3)
-
 	//We're going to include their username in the ZXCVBN password strength estimator.
-	inputs[0]=(username != '')?document.getElementById(username).value:'';
+	inputs[0]=(username !== '')?document.getElementById(username).value:'';
 	//Plus if their username is uppercase as the first letter.
 	inputs[1]= inputs[0] === ''?"":inputs[0].substr(0,1).toUpperCase()+inputs[0].substr(1);
 	//also include the name of the URl that this is used on.
@@ -102,7 +140,7 @@ function score_password(button_el,username,password,password_confirm_id){
 	if(password !== document.getElementById(password_confirm_id).value){
 		 el.innerText="Passwords must Match!";
 			el.setAttribute("style","color:red;font-weight:bold");
-		 return;
+		 return 0;
 	}
 	let result=zxcvbn(password,inputs);
 	let guesses = result.guesses_log10;
@@ -178,6 +216,6 @@ function score_password(button_el,username,password,password_confirm_id){
 	}
 
 	but.disabled = (result.score < 3);
-
+	document.getElementById('password_score').value = score;
 	return result.score;
 }

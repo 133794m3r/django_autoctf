@@ -20,8 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ao+x%_&n3ub_9wt=*%2@#i9p3($b)!wrj@kxuun@@6(^r%pi0i'
-
+#FOR DEVELOPMENT uncomment the line below and comment out the 2 lines below it.
+# SECRET_KEY = 'IVuPsvUW2LX38Ae6EG0uX6Ajq8DIJ6OMnIRdLTYMLN-eagUQKYbaDs4chLJ3yUNft9AvnvrBrhPyTqKFxREvkQ'
+with open('secret_key.txt') as f:
+    SECRET_KEY = f.read().strip()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -32,13 +34,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
 	'ctf_club',
-    'django.contrib.admin',
+    #'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 #    'ctf_club.apps.CtfClubConfig',
+	'ctf_club.apps.RateLimitedAdminConfig'
 ]
 
 MIDDLEWARE = [
@@ -77,15 +80,31 @@ STATICFILES_DIRS = [
 ]
 WSGI_APPLICATION = 'capstone_project.wsgi.application'
 
-
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+
+}"""
+#Uncomment the line below to have it run from postgres(as I am on the server.)
+#and set the username and password to whatever you want it to be.
+psql_user = os.getenv("PSQL_USER")
+psql_pass = os.getenv("PSQL_PASS")
+
+DATABASES = {
+	'default': {
+	    'ENGINE': 'django.db.backends.postgresql',
+	    'NAME': 'ctf_club',
+	    'USER': psql_user,
+	    'PASSWORD': psql_pass,
+	    'HOST': 'localhost',
+	    'PORT': '5432',
+	}
 }
 
 AUTH_USER_MODEL = "ctf_club.User"
@@ -115,6 +134,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -134,3 +159,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+FIXTURE_DIRS = [
+   'ctf_club/fixtures/',
+]

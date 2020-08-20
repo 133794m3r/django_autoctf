@@ -1,8 +1,10 @@
-from django.contrib.auth.hashers import BasePasswordHasher, mask_hash
-import hashlib
 import binascii
+import hashlib
+
+from django.contrib.auth.hashers import BasePasswordHasher, mask_hash
 from django.utils.crypto import (get_random_string, constant_time_compare)
 from django.utils.translation import gettext_noop as _
+
 
 class ScryptPasswordHasher(BasePasswordHasher):
 
@@ -16,7 +18,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
 	n = 15
 	#may make this be 13. Each number higher results in 2MiB of more memory.
 
-	r = 8
+	r = 9
 	p = 1
 	dklen = 32
 	#65MiB
@@ -64,10 +66,7 @@ class ScryptPasswordHasher(BasePasswordHasher):
 		"""
 
 		#should give ~100bits of entropy. Characters are safe for SQL characterset and programming.
-		if salt and len(salt) < 16:
-				salt = get_random_string(16,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_+=.')
-		elif not salt:
-			salt = get_random_string(16,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_+=.')
+		salt =salt or get_random_string(16,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_+=.')
 		n = n or self.n
 		r = r or self.r
 		p = p or self.p

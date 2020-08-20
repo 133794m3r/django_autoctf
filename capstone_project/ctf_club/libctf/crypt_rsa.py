@@ -14,7 +14,14 @@ LGPLv3 or Later (2019 - 2020)
 from .crypt_math import *
 
 
-def calc_r(n):
+def calc_r(n:int ) -> int:
+	"""
+	Calculates the value r such that it is co-prime with n and is also itself prime.
+
+	:param n: The modulus n.
+	:return: the integer r.
+	"""
+
 	from math import gcd
 	r=get_prime(8)
 	while gcd(r,n) != 1:
@@ -23,33 +30,44 @@ def calc_r(n):
 		r=get_prime(8)
 	return r
 
-def common_modulus_attack(c1,c2,e1,e2,N):
-	a=0;
-	b=0;
-	mx=0;
-	my=0;
-	i=0;
+def common_modulus_attack(c1: int, c2: int, e1: int, e2: int, n: int) -> int:
+	"""
+	This functionw will carry out the common modulus attack.
+
+	:param c1: Ciphertext integer 1.
+	:param c2: Ciphertext integer 2.
+	:param e1: encryption exponent 1.
+	:param e2: encryption exponent 2.
+	:param n: The modulus n.
+	:return: The plaintext integer P.
+	"""
 
 	if gcd_fast(e1,e2)[0] != 1:
 		raise ValueError('e1 and e2 are invalid.')
 	a=mod_inv(e1,e2)
 	b=(gcd_fast(e1,e2)[0] - e1 * a ) // e2
-	i=mod_inv(c2,N)
-	mx=pow(c1,a, N)
-	my=pow(i,-b, N)
+	i=mod_inv(c2, n)
+	mx=pow(c1, a, n)
+	my=pow(i, -b, n)
 
-	return (mx*my) % N
+	return (mx*my) % n
 
 # Radford ASCII Decoder
 # This function decodes a number into a 7bit ASCII string and returns said string.
-def naive_ascii_decode(encoded_number, length):
-	i=0;
-	j=0;
-	val=0;
-	tmp='';
-	output_str='';
-	length=length-1;
-	num_len=len(encoded_number)
+def naive_ascii_decode(encoded_number: str, length: int) -> str:
+	"""
+	This function will decode an integer into a str if it's been encoded with
+	naive ASCII encoding.
+
+	:param encoded_number: The encoded integer as a string.
+	:param length: The length(in bytes that the output string should be).
+	:return: The decoded string.
+	"""
+
+	j=0
+	output_str=''
+	length=length-1
+
 	for i in range(0,length):
 		tmp=encoded_number[j]
 		if tmp == '1':
@@ -67,14 +85,21 @@ def naive_ascii_decode(encoded_number, length):
 
 	return output_str
 
+
 # Encodes any string of ASCII(7bit) characters into a number the way that Radford has
 # done it for the chal.
-def naive_ascii_encode(string_to_encode, string_length):
-	tmp_str='';
-	output_str='';
+def naive_ascii_encode(string_to_encode: str, string_length: int) -> str:
+	"""
+	Encodes an ASCII string with naive ascii encoding. Where each byte of
+	the string is encoded into the ASCII code point and then combined
+	together into a string representation of that integer.
 
-	tmp=0;
-	i=0;
+	:param string_to_encode: The input string.
+	:param string_length: The length of the string.
+	:return: The encoded string.
+	"""
+
+	output_str=''
 
 	for i in range(0,string_length):
 		tmp=ord(string_to_encode[i:i+1])
@@ -88,13 +113,16 @@ def naive_ascii_encode(string_to_encode, string_length):
 
 # this decodes a string of bytes(ASCII text only really otherwise you need to convert it
 # to a byte stream.
-def rsa_ascii_encode(string_to_encode,string_length):
-	tmp_str='';
-	output_str='';
-	x=0;
+def rsa_ascii_encode(string_to_encode:str,string_length:int) -> int:
+	"""
+	OS2IP aka RSA's standard string to integer conversion function.
+
+	:param string_to_encode: The input string.
+	:param string_length: How many bytes the string is.
+	:return: The integer representation of this string.
+	"""
+	x=0
 	string_to_encode=string_to_encode[::-1]
-	tmp=0;
-	os=[]
 	i=0
 	while i<string_length:
 		tmp=ord(string_to_encode[i:i+1])
@@ -105,9 +133,18 @@ def rsa_ascii_encode(string_to_encode,string_length):
 
 
 #This converts the number to a string out of it.
-def rsa_ascii_decode(x,x_len):
+def rsa_ascii_decode(x:int,x_len:int) -> str:
+	"""
+	I2OSP aka RSA's standard ascii decoder. Decodes the integer X into
+	multiple bytes and finally converts those ASCII codepoints into an
+	ASCII string.
+
+	:param x: Integer X to be converted to string.
+	:param x_len: the length that the string will be.
+	:return: A string which represents teh decoded value of X.
+	"""
+
 	X = []
-	i=0;
 	string=''
 	#max_len=len(x)
 	if x>=pow(256,x_len):
@@ -126,13 +163,22 @@ def rsa_ascii_decode(x,x_len):
 
 
 # consistent for the library.
-def get_prime(prime_length):
+def get_prime(prime_length:int) -> int:
+	"""
+	Returns a prime number. Doing it this way to require less modules.
+
+	:param prime_length: The length in bits that the prime has to be.
+	:return: A prime integer.
+	"""
+
 	from secrets import randbits
 	from sympy import isprime
+
 	num = randbits(prime_length)
 	while not isprime(num):
 		num = randbits(prime_length)
 	return num
+
 
 # creates and returns p,q, and N. of length prime_length
 # prime_length is a value of 2**prime_length. Aka the bits for prime length
@@ -141,7 +187,13 @@ def get_prime(prime_length):
 # This could be done via built-in C functions but it's best to visualize
 # how it's working so people understand it.
 
-def calc_n(prime_length):
+def calc_n(prime_length:int) -> int:
+	"""
+	Creates and returns p,q, and N of length prime_length.
+
+	:param prime_length: The number of bits that the value N should be.
+	:return:
+	"""
 	prime_length = prime_length // 2
 	p=get_prime(prime_length)
 	q=get_prime(prime_length)
@@ -165,6 +217,7 @@ def calc_e(prime_length: int, lambda_n: int) -> int:
 	:param lambda_n: The LAMBDA(N) value(or PHI(N))
 	:return: the prime e that'll work with RSA.
 	"""
+
 	coprime=0
 	e=0
 	while coprime!=1:
@@ -183,9 +236,9 @@ def calc_lambda(p: int,q: int) -> int:
 	:param q: the prime q
 	:return: the totient value.
 	"""
-	lamda_n=0;
-	lamda_n=fast_lcm(p-1,q-1)
-	return lamda_n
+
+	lambda_n=fast_lcm(p-1,q-1)
+	return lambda_n
 
 
 def calc_d(e: int, lambda_n: int) -> int:
@@ -201,13 +254,13 @@ def calc_d(e: int, lambda_n: int) -> int:
 	:param lambda_n: the Carmachael's lambda of n.
 	:return: the decryption exponent.
 	"""
-	d=0
+
 	d=mod_inv(e, lambda_n)
 
 	return d
 
 
-def rsa_encrypt(m: int, e: int, N: int) -> int:
+def rsa_encrypt(m: int, e: int, n: int) -> int:
 	"""
 	rsa_encrypt
 
@@ -217,16 +270,16 @@ def rsa_encrypt(m: int, e: int, N: int) -> int:
 
 	:param m: the plaintext message.
 	:param e: the encryption exponent.
-	:param N: the modulus.
+	:param n: the modulus.
 	:return: The ciphertext integer.
 	"""
 
-	c=pow(m,e,N)
+	c=pow(m, e, n)
 
 	return c
 
 
-def rsa_decrypt(c: int, d: int, N: int) -> int:
+def rsa_decrypt(c: int, d: int, n: int) -> int:
 	"""
 
 	Implements RSA Decryption via the mathematical formula.
@@ -235,11 +288,11 @@ def rsa_decrypt(c: int, d: int, N: int) -> int:
 
 	:param c: Ciphertext integer.
 	:param d: the private key exponent.
-	:param N: the modulus.
+	:param n: the modulus.
 	:return: the plaintext integer M.
 	"""
-	m=0
-	m=pow(c,d,N)
+
+	m=pow(c, d, n)
 	return m
 
 
@@ -253,9 +306,9 @@ def crt_e_maker(e: int, n_len: int = 256) -> tuple:
 	:param n_len: the length of the value of N in bits.
 	:return: a tuple containing the values of p,q, and n respectively.
 	"""
+
 	p,q,N = calc_n(n_len)
-	lamda_n=calc_lambda(p,q)
-	gcd=0;
+	gcd=0
 	while gcd != 1:
 		p,q,N = calc_n(n_len)
 		lambda_n=calc_lambda(p,q)
@@ -271,6 +324,7 @@ def make_fermat_key(bit_width: int) -> tuple:
 	:param bit_width: the size of the key in bits.
 	:return: The values p,q,n,e, and d.
 	"""
+
 	from sympy import nextprime
 	prime_length = bit_width // 2
 	p=get_prime(prime_length)
@@ -296,7 +350,8 @@ def make_fermat(bit_width):
 	:return: p,q,n,e,d
 	:rtype: tuple
 	"""
-	p,q,n,e,d = make_fermat_key(bit_width);
+
+	p,q,n,e,d = make_fermat_key(bit_width)
 	return p,q,n,e,d
 
 
@@ -308,9 +363,10 @@ def make_pubkey(n: int, e: int) -> str:
 	:param e: the public key exponent.
 	:return: A PEM encoded version of the public key.
 	"""
+
 	from Crypto.PublicKey import RSA
 	key=RSA.construct((n,e))
-	key_str=key.exportKey('PEM').decode('utf-8')
+	key_str=key.exportKey().decode('utf-8')
 	return key_str
 
 
@@ -324,7 +380,8 @@ def make_privkey(n: int,e: int,d: int) -> str:
 	:param d: The private key exponent d.
 	:return: A PEM encoded version of the private key.
 	"""
+
 	from Crypto.PublicKey import RSA
 	key=RSA.construct((n,e,d))
-	key_str=key.exportKey('PEM').decode('utf-8')
+	key_str=key.exportKey().decode('utf-8')
 	return key_str

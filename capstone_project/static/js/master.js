@@ -23,14 +23,18 @@ function submit(route,content,callback){
 		},
 		credentials:"same-origin",
 		body:JSON.stringify(content)
-	})
+		})
 		.then(response=>response.json())
 		.then(result=>{
 			if(callback){
 				callback(result)
 			}
+		})
+		.catch(error=>{
+			console.log("Error:",error);
 		});
 }
+
 
 /**
  * This is just a wrapper around fetch for my get reqeusts to give me the json result.
@@ -43,8 +47,12 @@ function get(route,callback){
 		.then(response =>response.json())
 		.then(result=>{
 			callback(result)
+		})
+		.catch(error=>{
+			console.log("Error:",error);
 		});
 }
+
 
 /**
  *
