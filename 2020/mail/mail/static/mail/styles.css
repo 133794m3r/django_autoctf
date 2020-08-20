@@ -1,7 +1,0 @@
-textarea {
-	min-height: 400px;
-}
-
-[id*="-view"]{
-	display:none;
-}
