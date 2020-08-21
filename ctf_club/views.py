@@ -449,7 +449,7 @@ def challenge_admin(request):
 				chal_obj = {
 					'name': tmp_name, 'category': challenge.category.name, 'full_description': challenge.description,
 					'description': challenge_template['description'], 'sn': challenge_template['sn'],
-					'edit': True, 'flag': challenge.flag, 'can_have_files':challenge_template['files']}
+					'edit': True, 'flag': challenge.flag, 'can_have_files':challenge_template['files'],'variety':challenge_template['variety']}
 				if variety is not None:
 					if varieties_used.get(indexed):
 						varieties_used[indexed].append(variety)

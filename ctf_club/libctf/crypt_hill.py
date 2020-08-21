@@ -1,4 +1,5 @@
 from .crypt_math import *
+
 """
 Crypto Lab Library - Hill Module
 Macarthur Inbody <admin-contact@transcendental.us>

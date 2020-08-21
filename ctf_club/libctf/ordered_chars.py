@@ -9,8 +9,8 @@ This module will generate a test case and file for people to use. They have to c
 
 
 # then I import the function/module.
-from random import randint
 
+from random import randint
 from .lib import make_string
 
 

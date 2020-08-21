@@ -345,6 +345,7 @@ function set_challenge_info(new_info,challenge_type,variety = -1){
 			return;
 		}
 	}
+
 }
 
 

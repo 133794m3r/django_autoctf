@@ -3,7 +3,6 @@ Crypto Lab Library - Hill Module
 Macarthur Inbody <admin-contact@transcendental.us>
 Licensed LGPLv3 or Later (2019 - 2020)
 """
-
 from random import randint
 
 def gcd_fast(a: int, b: int) -> tuple:

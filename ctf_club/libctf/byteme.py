@@ -1,9 +1,6 @@
 #  Macarthur Inbody <admin-contact@transcendental.us>
 #  Licensed under LGPLv3 Or Later (2020)
-
-# !/usr/bin/env python3
-from .lib import nato_translated_words
-from .imports import *
+from random import randint
 
 def make_encoded_msg(length: int = 3) -> tuple:
 	"""

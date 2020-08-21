@@ -1,3 +1,4 @@
+from random import randint
 #libraries
 from .crypt_math import *
 from .crypt_rsa import *

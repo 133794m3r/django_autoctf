@@ -169,6 +169,8 @@ def make_masterhacker():
 	number_of_items = randint(3,5)
 	filenames = make_filenames(number_of_items)
 	filenames_write = ','.join(filenames)
+	tuples = make_tuples(number_of_items, max_storage)
+	tuples_listed = list(map(list, zip(*tuples)))
 	storages = ','.join([str(x) for x in tuples_listed[0]])
 	values = ','.join([str(x) for x in tuples_listed[1]])
 	bagged = master_hacker(max_storage,tuples)
