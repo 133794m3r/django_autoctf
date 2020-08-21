@@ -39,8 +39,8 @@ function fetch_chal(challenge_id){
 		}
 
 		document.getElementById('hints_container').innerHTML = hint_html;
-		let cols = '<div class="row mb-2"><div class="col-12 text-center mt-3"><h2>Files</h2></div>'
 		if(challenge.files !== null){
+			let cols = '<div class="row mb-2"><div class="col-12 text-center mt-3"><h2>Files</h2></div>'
 			for (let i = 0; i < challenge.files.length; i++) {
 				cols += `<div class='col-12 text-center mt-3'><a href="/file/${challenge.files[i]}" class="btn btn-primary" target="_blank">${challenge.files[i]}</a></div>`
 			}
