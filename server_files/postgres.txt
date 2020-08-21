@@ -1,0 +1,1 @@
+First create a user named django with either the createuser command as the user postgres, or b) do it from the psql console. Either way you must first create the user. Then run the commands listed in the sql file in this directory.
