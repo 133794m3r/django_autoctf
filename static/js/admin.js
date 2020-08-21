@@ -24,6 +24,7 @@ function modal_challenge(event,challenge_type,edit){
 	let flag = ''
 	let chal = CHALLENGES[challenge_type];
 	let challenge_name = chal.name;
+	const category = CHALLENGES[challenge_type].category
 	switch(challenge_type) {
 		//only fizzbuzz is weird for right now. In the future it'll be more generalized.
 		case "fizzbuzz":
@@ -66,9 +67,14 @@ function modal_challenge(event,challenge_type,edit){
 			document.getElementById('submit_chal').disabled = true;
 
 			flag = flag ? flag : '';
-			inner_content = `<div class="col-lg-7 col-md-8 col-sm-9 form-group">
+			if(flag === '' && category === "Programming"){
+				inner_content = ''
+			}
+			else {
+				inner_content = `<div class="col-lg-10 col-md-10 col-sm-11 form-group">
 				<textarea id='plain_text' name='plain_text' class="input_items form-text w-100" rows="2" cols="40" onkeyup="check_len('plain_text','submit_chal')">${flag}</textarea>
 			</div>`;
+			}
 			 if (challenge_type === 'hill' || challenge_type === 'affine') {
 			 inner_content += `<div class="col-lg-5 col-md-4 col-sm-3 form-group">
 					<select id="variety" onchange="change_variety()"><option value="0">Easy</option><option value="1">Medium</option></select>`;
