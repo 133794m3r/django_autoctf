@@ -11,6 +11,7 @@ from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http40
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+
 # ratelimiter
 from ratelimit.decorators import ratelimit
 
@@ -22,6 +23,9 @@ CTFClub Project
 By Macarthur Inbody <admin-contact@transcendental.us>
 Licensed AGPLv3 Or later (2020)
 """
+
+#TODO: May make it so that all solves/hints/etc also check for TFA being valid
+# but for now I won't.
 
 from .models import *
 from .util import *
@@ -128,8 +132,6 @@ def logout_view(request):
 
 
 @require_http_methods(["GET"])
-#@login_required(login_url="login")
-# @ratelimit(key='user',rate='45/m')
 def challenge_view(request,challenge_id):
 	files = None
 	if request.user.is_authenticated:
@@ -333,6 +335,7 @@ def control_panel(request,username):
 	points = User.objects.get(username=username).points
 
 	return render(request,'control_panel.html',{'points':points,'username':username})
+
 
 @ratelimit(key='user',rate='30/m')
 @login_required(login_url="login")
@@ -712,8 +715,10 @@ def verify_tfa(request):
 		else:
 			return render(request,"verify_tfa.html",{"token_invalid":True})
 
+
 def about(request):
 	return render(request,"about.html")
+
 
 @login_required()
 @require_http_methods(["GET"])

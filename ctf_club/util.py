@@ -192,7 +192,3 @@ def rank_users(users):
 			else:
 				user_ranks.append({'len':1,'users':[user]})
 	return user_ranks
-
-
-def tfa_is_authorized(request):
-	pass
