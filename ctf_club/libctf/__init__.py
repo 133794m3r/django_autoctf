@@ -9,4 +9,5 @@ from .rsa_flags import *
 from .fizzbuzz import *
 from .classical_ciphers import make_affine, make_hill
 from .additional_pairs import make_additional_pairs
-from .ordered_chars import make_orded_chars
+from .ordered_chars import make_ordered_chars
+from .byteme import make_byteme

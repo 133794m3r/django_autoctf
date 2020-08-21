@@ -11,6 +11,9 @@ This module will generate a test case and file for people to use. They have to c
 # then I import the function/module.
 from random import randint
 
+from .lib import make_string
+
+
 def ordinal_counter(input_string):
 	"""
 ordinal_counter({string} input_string)
@@ -33,32 +36,10 @@ return total_value {int} The total value of all ordinal values summed.
 	return total_value
 
 
-def make_string(string_length=100):
-	"""
-make_string({int} string_length)
-
-This function will create a string of string_length size and return it.
-
-args:
-string_length {int} The length of the string to generate.
-
-return out_string {string} the created string.
-
-	"""
-
-	charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz '
-	out_string = ''
-	j = 0
-	for i in range(string_length):
-		if j >= 150:
-			out_string += ' '
-			j = 0
-		out_string += charset[randint(0, 52)]
-		j += 1
-	return out_string
 
 
-def make_orded_chars(string_length=1024):
+
+def make_ordered_chars(string_length=1024):
 	"""
 make_ordinal_counter({int} string_length)
 
@@ -86,7 +67,7 @@ return Nothing.
 	mapped_values = str(dict(zip(string, ordinal_list))).replace(": ", "=>")[1:-1]
 	# print this help string. I'm using positional options. so {0} means first argument. {1} means second to format. This way I can easily repeat it.
 	desc +=f"""<br /><h3>TESTCASE</h3>
-<p>For the string<span class="text-mono">'{string}'</span>. If you added up the ordinal values of each of the characters you'd have gotten {total_value}. Thus the flag is {total_value}. The ordinal mappings can be seen below.<br /><span class="text-mono">{mapped_values}</span>
+<p>For the string<span class="text-monospace">'{string}'</span>. If you added up the ordinal values of each of the characters you'd have gotten {total_value}. Thus the flag is {total_value}. The ordinal mappings can be seen below.<br /><span class="text-monospace">{mapped_values}</span>
 </p>"""
 	# generate the flag string.
 	string = make_string(randint(1024, 2048))

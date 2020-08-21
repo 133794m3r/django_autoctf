@@ -100,7 +100,7 @@ def make_additional_pairs(number_of_items=100):
 
 	desc = f"""<p>For this challenge you'll be given a list of integers. You will have to find all pairs of integers(meaning 2) that add up to the chosen sum value. Each item can only be used once. So once you use it, you should not use it again, as in the item at that index. The integers themselves may be repeated again throughout the list but you should only use each index once when you're creating your pairs.</p> <br />
 <p> The flag will be in the format of {{ chosen_sum }};{{ a_pair }}{{ a_second_pair}}. This flag is an interview style question. You will find your testcase below.</p>
-<h3>TESTCASE</h3><p> Given the list of integers below find all pairs that add up to the number {testcase_chosen_sum}. <span class="text-mono">{random_list} </span> <br /> Thus the flag would then be <span class="text-mono"> {testcase_flag}</span></p>
+<h3>TESTCASE</h3><p> Given the list of integers below find all pairs that add up to the number {testcase_chosen_sum}. <span class="text-monospace">{random_list} </span> <br /> Thus the flag would then be <span class="text-monospace"> {testcase_flag}</span></p>
 	"""
 
 	return desc,flag,"additional_pairs_list.txt"

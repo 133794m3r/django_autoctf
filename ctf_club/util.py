@@ -2,7 +2,7 @@
 from random import randint
 
 # RSA Flags
-from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod,make_additional_pairs,make_orded_chars
+from .libctf import make_fermat_chal, make_bsa, make_hba, make_rsa, make_common_mod,make_additional_pairs,make_ordered_chars,make_byteme
 # Classical Ciphers
 from .libctf import make_hill, make_affine
 from .libctf import make_masterhacker, make_fizzbuzz
@@ -36,7 +36,8 @@ CHALLENGE_FUNCS = {
 	"common_mod":make_common_mod,
 	"master_hacker":make_masterhacker,
 	"additional_pairs":make_additional_pairs,
-	"ordered_chars":make_orded_chars,
+	"ordered_chars":make_ordered_chars,
+	"byteme":make_byteme,
 }
 
 CATEGORIES = ["Classical Crypto","Modern Crypto","Programming"]
@@ -82,6 +83,9 @@ CHALLENGES_TEMPLATES = [
 	{"name": "You are out of Order!", "sn": "ordered_chars", "category": "Programming",
 	 "description": "This challenge requires the user to go through a list of alphabetical characters and get the sum of the code points.",
 	 "points": 90, "variety": False, "files": True},
+	{"name": "Back to BASEcs with th EBS", "sn": "byteme", "category": "Programming",
+	 "description": "This challenge requires the user decode a hex encoded string that has each byte separated by some padding character.",
+	 "points": 60, "variety": False, "files": True},
 ]
 
 
@@ -127,69 +131,46 @@ def jsonify_queryset(queryset: object) -> dict:
 
 	return out
 
-def rot_encode(msg):
-	shift = randint(1,25)
-	out = ''
-	for c in msg:
-		x = ord(c)
-		if 65 <= x <= 90:
-			#add the shift.
-			x+=shift
-			#if it's greater than 'Z'.
-			if x>=90:
-				#handle overflows.
-				x=(x-90)+64
 
-		#else if it's lowercase ascii.
-		elif 97 <= x <= 122:
-			#same thing again.
-			x+=shift
-			#same if it's greater than 'z'.
-			if x>=122:
-				#handle overflow.
-				x=(x-122)+96
-
-		out += chr(x)
-	return out
 
 #since this is a ctf site I'll have them solve a simple ceaser cipher message along with a basic math question.
-def make_rot_captcha():
-	translation = {'A':['Alpha','Afirm','Able'],
-	'B':['Bravo','Baker','Buy'],
-	'C':['Charlie','Charlie','Cast'],
-	'D':['Delta','Dog','Dock'],
-	'E':['Echo','Easy','Easy'],
-	'F':['Foxtrot','Fox','France'],
-	'G':['Golf','George','Greece'],
-	'H':['Hotel','How','Have'],
-	'I':['India','Italy','Item'],
-	'J':['Juliet','Jig','John'],
-	'K':['Kilo','Kimberly','King'],
-	'L':['Lima','Love','Lima'],
-	'M':['Mama','Mary','Mike'],
-	'N':['November','Nan','Nap'],
-	'O':['Oscar','Oboe','Opal'],
-	'P':['Papa','Peter','Pup'],
-	'Q':['Quebec','Queen','Quack'],
-	'R':['Romeo','Roger','Rush'],
-	'S':['Sierra','Sugar','Sail'],
-	'T':['Tango','Tare','Tape'],
-	'U':['Uniform','Uncle','Unit'],
-	'V':['Victor','Victor','Vice'],
-	'W':['Whiskey','William','Watch'],
-	'X':['Xray','X-ray','X-Ray'],
-	'Y':['Yankee','York','Yoke'],
-	'Z':['Zulu','Zebra','Zed']}
-
-	words = ['COME', 'DEAD', 'DIED', 'FOUR', 'FROM', 'FULL', 'GAVE', 'HAVE', 'HERE', 'LAST', 'LIVE', 'LONG', 'NOTE', 'POOR', 'TAKE', 'TASK', 'THAT', 'THEY', 'THIS', 'THUS', 'VAIN', 'WHAT', 'WILL', 'WORK', 'ABOVE', 'BIRTH', 'BRAVE', 'CAUSE', 'CIVIL', 'EARTH', 'EQUAL', 'FIELD', 'FINAL', 'FORTH', 'GREAT', 'LIVES', 'MIGHT', 'NEVER', 'NOBLY', 'PLACE', 'POWER', 'SCORE', 'SENSE', 'SEVEN', 'SHALL', 'THEIR', 'THESE', 'THOSE', 'UNDER', 'WHICH', 'WORLD', 'YEARS', 'BEFORE', 'ENDURE', 'FORGET', 'FOUGHT', 'GROUND', 'HALLOW', 'HIGHLY', 'LARGER', 'LITTLE', 'LIVING', 'NATION', 'PEOPLE', 'PERISH', 'PROPER', 'RATHER', 'SHOULD', 'BROUGHT', 'CREATED', 'DETRACT']
-	word_len = 70
-	word = words[randint(0,70)]
-	msg = ''
-	for c in word:
-		msg += translation[c][randint(0,2)] + ' '
-	captcha_msg = rot_encode(msg)
-
-	return captcha_msg,msg
+# def make_rot_captcha():
+# 	translation = {'A':['Alpha','Afirm','Able'],
+# 	'B':['Bravo','Baker','Buy'],
+# 	'C':['Charlie','Charlie','Cast'],
+# 	'D':['Delta','Dog','Dock'],
+# 	'E':['Echo','Easy','Easy'],
+# 	'F':['Foxtrot','Fox','France'],
+# 	'G':['Golf','George','Greece'],
+# 	'H':['Hotel','How','Have'],
+# 	'I':['India','Italy','Item'],
+# 	'J':['Juliet','Jig','John'],
+# 	'K':['Kilo','Kimberly','King'],
+# 	'L':['Lima','Love','Lima'],
+# 	'M':['Mama','Mary','Mike'],
+# 	'N':['November','Nan','Nap'],
+# 	'O':['Oscar','Oboe','Opal'],
+# 	'P':['Papa','Peter','Pup'],
+# 	'Q':['Quebec','Queen','Quack'],
+# 	'R':['Romeo','Roger','Rush'],
+# 	'S':['Sierra','Sugar','Sail'],
+# 	'T':['Tango','Tare','Tape'],
+# 	'U':['Uniform','Uncle','Unit'],
+# 	'V':['Victor','Victor','Vice'],
+# 	'W':['Whiskey','William','Watch'],
+# 	'X':['Xray','X-ray','X-Ray'],
+# 	'Y':['Yankee','York','Yoke'],
+# 	'Z':['Zulu','Zebra','Zed']}
+#
+# 	words = ['COME', 'DEAD', 'DIED', 'FOUR', 'FROM', 'FULL', 'GAVE', 'HAVE', 'HERE', 'LAST', 'LIVE', 'LONG', 'NOTE', 'POOR', 'TAKE', 'TASK', 'THAT', 'THEY', 'THIS', 'THUS', 'VAIN', 'WHAT', 'WILL', 'WORK', 'ABOVE', 'BIRTH', 'BRAVE', 'CAUSE', 'CIVIL', 'EARTH', 'EQUAL', 'FIELD', 'FINAL', 'FORTH', 'GREAT', 'LIVES', 'MIGHT', 'NEVER', 'NOBLY', 'PLACE', 'POWER', 'SCORE', 'SENSE', 'SEVEN', 'SHALL', 'THEIR', 'THESE', 'THOSE', 'UNDER', 'WHICH', 'WORLD', 'YEARS', 'BEFORE', 'ENDURE', 'FORGET', 'FOUGHT', 'GROUND', 'HALLOW', 'HIGHLY', 'LARGER', 'LITTLE', 'LIVING', 'NATION', 'PEOPLE', 'PERISH', 'PROPER', 'RATHER', 'SHOULD', 'BROUGHT', 'CREATED', 'DETRACT']
+# 	word_len = 70
+# 	word = words[randint(0,70)]
+# 	msg = ''
+# 	for c in word:
+# 		msg += translation[c][randint(0,2)] + ' '
+# 	captcha_msg = rot_encode(msg)
+#
+# 	return captcha_msg,msg
 
 def rank_users(users):
 	user_ranks = []
