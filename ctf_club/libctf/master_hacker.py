@@ -75,14 +75,6 @@ def master_hacker(max_storage, items):
 	return flash_drive
 
 
-# items
-# TODO: Actually come up with a list of possible item names.
-"""
-Then I'll actually pull from that list to get my string.
-Their flag will be something like items
-"""
-
-
 def make_tuples(number_of_items: int, max_storage: int) -> list:
 	"""
 	This function will generate all of the possible tuples that the person
