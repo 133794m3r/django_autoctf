@@ -121,19 +121,5 @@ That paper goes over the linear algebra required to crack a message enciphered w
 - Attempting a solve will result in an alert showing. If it's successful then they'll get the "solved" message. If they didn't then it'll show "wrong answer." Also the alert will dissappear after some period of time.
 - The modal dialogues for the admin view or the challenge view can all be stacked upon eachother while not causing the other views to be obscured.
 
-### Installation
-The instructions below don't assume you're going to use a virtual environment. It's up to you chose if you want to have one.
-```
-pip3 install -r requirements.txt
-./manage.py makemigrations
-./manage.py migrate
-./manage.py loaddata initial_data
-```
-
-### Requirements
-Also requires Python 3.6 or later as it utilizes hashlib for Scrypt.
-
-pip3 install -r requirements.txt
-
 The sympy library is utilized for the RSA flags I could've wrote them myself but I decided against it. The pycryptodome package is only required if you want to generate public and private keys in PEM format.
 This includes all packages required.

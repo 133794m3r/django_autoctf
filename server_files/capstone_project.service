@@ -1,5 +1,5 @@
 [Unit]
-Description=uWSGI Instance to serve hacks project
+Description=uWSGI Instance to serve the DjangoAutoCTF
 After=network.target
 
 [Service]
