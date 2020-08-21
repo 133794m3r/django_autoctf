@@ -1,5 +1,5 @@
 import re
-from random import randint
+from .imports import *
 
 from ctf_club.libctf import generate_random_key, hill_encrypt, affine_encrypt
 

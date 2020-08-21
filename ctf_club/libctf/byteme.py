@@ -3,10 +3,15 @@
 
 # !/usr/bin/env python3
 from .lib import nato_translated_words
+from .imports import *
 
+def make_encoded_msg(length: int = 3) -> tuple:
+	"""
 
-def make_encoded_msg(length=3):
-	from random import randint
+	:param length:
+	:return:
+	"""
+
 	padding_character = "!#%&,/;<>@_`{|}~ "[randint(0,16)]
 	random_string = nato_translated_words(length)
 	output_string = ''

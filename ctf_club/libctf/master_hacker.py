@@ -1,7 +1,17 @@
 #  Macarthur Inbody <admin-contact@transcendental.us>
 #  Licensed under LGPLv3 Or Later (2020)
 from random import randint
-def maximum_tuple(tuples, start=0):
+
+def maximum_tuple(tuples:tuple, start:int=0):
+	"""
+	maximum_tuple
+
+	Returns the maximum tuple in the list from some index or the start of the list of tuples.
+	:param tuples: The tuples to search.
+	:param start: The starting index or 0.
+	:return: the index of the maximum tuple.
+	"""
+
 	maximum = sum(tuples[start])
 	num = len(tuples)
 	index = 0
@@ -15,6 +25,14 @@ def maximum_tuple(tuples, start=0):
 
 
 def total_value(comb, max_storage):
+	"""
+	Calculates the total value of all items we found as long as the storage used is less than the maximum.
+
+	:param comb: The list of items to go through.
+	:param max_storage: The maximum storage we can use.
+	:return:
+	"""
+
 	total_storage = current_value = 0
 	for storage, value in comb:
 		total_storage += storage
@@ -24,6 +42,14 @@ def total_value(comb, max_storage):
 
 
 def master_hacker(max_storage, items):
+	"""
+	This function will figure out the maximum amount of items that you can get.
+
+	:param max_storage:The maximum storage we can use.
+	:param items: The items we're going to search through.
+	:return: A list of all of the items were able to steal.
+	"""
+
 	number_of_items = len(items)
 	drive = [[-1 for j in range(max_storage + 1)] for i in range(number_of_items + 1)]
 	max_items = number_of_items + 1
@@ -82,6 +108,7 @@ def make_filenames(number_of_items: int) -> list:
 	:param number_of_items:The number of items we should generate.
 	:return: The list containing the file names.
 	"""
+
 	item_prefixes = ['SECRET', 'WIP', 'BACKUP', 'FINAL', 'BOOK', 'VOLUME', 'PLAY', 'ARCHIVE', 'PRAWN', 'PWN', 'PASSWORDS',
 	                 'KEY_VAULT', 'KEYS', 'BUSINESS_REPORTS', 'TOTALLY_LEGIT_EMAIL']
 	item_prefixes_len = len(item_prefixes) - 1

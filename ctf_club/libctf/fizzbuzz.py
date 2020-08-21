@@ -1,4 +1,4 @@
-from random import randint
+from .imports import *
 
 
 def make_fizzbuzz(start: int, end: int) -> tuple:

@@ -14,17 +14,15 @@ from random import randint
 from .lib import make_string
 
 
-def ordinal_counter(input_string):
+def ordinal_counter(input_string: str) -> int:
 	"""
-ordinal_counter({string} input_string)
+	Ordinal Counter
+	sums the value of all code points of a string.
 
-This function will add up the ordinal values of each character of a string
-so long as the character is uppercase.
-args:
-input_string {string} The string that we're going to process.
-
-return total_value {int} The total value of all ordinal values summed.
+	:param input_string: The string we're going to be counting on.
+	:return: An integer that represents the sum of all code points.
 	"""
+
 
 	total_value = 0
 	cp = 0
@@ -39,20 +37,12 @@ return total_value {int} The total value of all ordinal values summed.
 
 
 
-def make_ordered_chars(string_length=1024):
+def make_ordered_chars(string_length: int = 1024) -> tuple:
 	"""
-make_ordinal_counter({int} string_length)
-
-This function will create the flag for you. It will create a dynamically created test case of 10 characters. Then create the help text for them to visualize it. Then it will show them the answer for that test case.
-
-
-It will then generate the flag string. The string it generates will be 1024-2048 characters in length. The string has spaces at least every 150 characters so that word-wrapping will break at the space to make it easier to see when they open it. It will then calculate the total value of all of the uppercase letter's ordinal values and print it.
-
-
-args
-string_length {int} The length of the string to be generated.
-
-return Nothing.
+make_ordinal_counter
+This function will create the flag for you. It will create a dynamically created test case of 10 characters. Then create the help text for them to visualize it. Then it will show them the answer for that test case. It will then generate the flag string. The string it generates will be 1024-2048 characters in length. The string has spaces at least every 150 characters so that word-wrapping will break at the space to make it easier to see when they open it. It will then calculate the total value of all of the uppercase letter's ordinal values and print it.
+	:param string_length:  The length of the string we're giong to generate.
+	:return: a tuple containing the description, flag and filename.
 	"""
 
 	# printing the initial string that's static.
