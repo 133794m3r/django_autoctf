@@ -139,7 +139,7 @@ def challenge_view(request,challenge_id):
 
 	#If they've already solved it might as well show them the flag.
 		if solved:
-			chal = Challenges.objects.values('id','name','description','points','flag',"files_filename").get(id=challenge_id)
+			chal = Challenges.objects.values('id','name','description','points','flag',"files__filename").get(id=challenge_id)
 		else:
 			chal = Challenges.objects.values('id', 'name', 'description', 'points',"files__filename").get(id=challenge_id)
 		#a hack to get files by the proper name.
