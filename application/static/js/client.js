@@ -47,6 +47,9 @@ function fetch_chal(challenge_id){
 			cols += '</div>'
 			document.getElementById('description').insertAdjacentHTML('beforeend', cols);
 		}
+		else if(challenge.files == undefined){
+			document.getElementById('description').insertAdjacentHTML('beforeend','<div class="row mb-2"><div class="col-12 text-center mt-3"><h2>Files</h2></div><div class=\'col-12 text-center mt-3\'>As a guest user, you can\'t view any files.</div>');
+		}
 		const answer_el = document.getElementById('answer');
 		if(solved){
 			answer_el.value = challenge.flag;
