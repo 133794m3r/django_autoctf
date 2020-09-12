@@ -20,7 +20,7 @@ Follow instructions in the server files folder. Install uwsgi via either ```pip3
 Installation instructions will assume debian. For your own system you'll have to translate package names.
 
 ```
-apt-get install nginx nginx-extras postgresql
+apt-get install nginx nginx-extras postgresql memcached
 ```
 For pcre library it requires that you install pcre-dev. And you have to enable it, as I have in the wsgi.ini file. This is an optimization that can make uwsgi run faster in some circumstances.
 ### Requirements
