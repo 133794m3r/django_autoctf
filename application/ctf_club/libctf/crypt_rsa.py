@@ -173,10 +173,10 @@ def get_prime(prime_length:int) -> int:
 
 	from secrets import randbits
 	from sympy import isprime
-
-	num = randbits(prime_length)
+	
+	num = randbits(prime_length-1) | 2 << (prime_length-1) | 1
 	while not isprime(num):
-		num = randbits(prime_length)
+		num = randbits(prime_length-1) | 2 << (prime_length-1) | 1
 	return num
 
 

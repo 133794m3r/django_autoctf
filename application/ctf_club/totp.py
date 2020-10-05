@@ -63,15 +63,17 @@ def user_tfa_valid(view_func):
 	def _wrapped_view(request, *args, **kwargs):
 		#only check it if the user has been authenticated.
 		if request.user.is_authenticated:
-			#then check if they havent' enabled TFA no reason to require them to do it or to check the session variable.
+			print(request.user.tfa_enabled, request.session.get("verified_tfa",False))
+			#then check if they haven't enabled TFA no reason to require them to do it or to check the session variable.
 			if request.user.tfa_enabled is False:
 				return view_func(request,*args,**kwargs)
+
 			#check if the user has not been verified.
-			elif request.session.get('verified_tfa', False):
+			elif request.session.get('verified_tfa', False) is False:
 				from django.http import HttpResponseRedirect
 				from django.urls import reverse
 				return HttpResponseRedirect(reverse('verify_tfa'))
-			#they haven't been
+			#they've already been verified apparently.
 			else:
 				return view_func(request, *args, **kwargs)
 		else:

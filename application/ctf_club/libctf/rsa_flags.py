@@ -110,16 +110,16 @@ def make_common_mod(plaintext: str) -> tuple:
 	:return: A tuple containing the descriptiona nd the flag.
 	:rtype: tuple
 	"""
-
+	e_len = 32
 	m_len = len(plaintext)
 	M = int(naive_ascii_encode(plaintext, m_len))
 	n_len = (m_len * 15) + 1
 	p, q, n = calc_n(n_len)
 	l_n = calc_lambda(p, q)
-	e1 = calc_e(12, l_n)
+	e1 = calc_e(e_len, l_n)
 	c1 = rsa_encrypt(M, e1, n)
 	c1 = hex(c1).replace('L', '')
-	e2 = calc_e(12, l_n)
+	e2 = calc_e(e_len, l_n)
 	c2 = rsa_encrypt(M, e2, n)
 	c2 = hex(c2).replace('L', '')
 	n = hex(n).replace('L', '')

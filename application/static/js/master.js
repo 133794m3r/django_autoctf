@@ -21,6 +21,7 @@ function submit(route,content,callback){
 			'X-CSRFToken':csrftoken,
 			'X-Requested-With':'XMLHttpRequest'
 		},
+		referrerPolicy: "same-origin",
 		credentials:"same-origin",
 		body:JSON.stringify(content)
 		})
@@ -43,7 +44,9 @@ function submit(route,content,callback){
  * @param {function(...[*]=)} callback The callback function to call upon the end of the fetch request.
  */
 function get(route,callback){
-	fetch(`${route}`)
+	fetch(`${route}`,{
+		referrerPolicy: "same-origin",
+	})
 		.then(response =>response.json())
 		.then(result=>{
 			callback(result)
