@@ -110,6 +110,7 @@ def make_common_mod(plaintext: str) -> tuple:
 	:return: A tuple containing the descriptiona nd the flag.
 	:rtype: tuple
 	"""
+
 	e_len = 32
 	m_len = len(plaintext)
 	M = int(naive_ascii_encode(plaintext, m_len))
@@ -158,6 +159,7 @@ def make_bsa(plaintext: str) -> tuple:
 	:return: description,flag Where description is the description of the program and
 	the flag is the fake signature we're asking them to provide to us.
 	"""
+
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
 	n_len = (m_len * 9) + 1

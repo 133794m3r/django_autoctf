@@ -28,6 +28,7 @@ def calc_r(n:int ) -> int:
 		r=get_prime(8)
 	if gcd(r,n) != 1:
 		r=get_prime(8)
+
 	return r
 
 def common_modulus_attack(c1: int, c2: int, e1: int, e2: int, n: int) -> int:
@@ -172,11 +173,10 @@ def get_prime(prime_length:int) -> int:
 	"""
 
 	from secrets import randbits
-	from sympy import isprime
-	
-	num = randbits(prime_length-1) | 2 << (prime_length-1) | 1
+	from sympy import isprime,nextprime
+	num = randbits(prime_length)
 	while not isprime(num):
-		num = randbits(prime_length-1) | 2 << (prime_length-1) | 1
+		num = nextprime(num)
 	return num
 
 
@@ -187,7 +187,7 @@ def get_prime(prime_length:int) -> int:
 # This could be done via built-in C functions but it's best to visualize
 # how it's working so people understand it.
 
-def calc_n(prime_length:int) -> int:
+def calc_n(prime_length:int) -> tuple[int, int, int]:
 	"""
 	Creates and returns p,q, and N of length prime_length.
 
@@ -237,8 +237,7 @@ def calc_lambda(p: int,q: int) -> int:
 	:return: the totient value.
 	"""
 
-	lambda_n=fast_lcm(p-1,q-1)
-	return lambda_n
+	return fast_lcm(p-1,q-1)
 
 
 def calc_d(e: int, lambda_n: int) -> int:
@@ -255,9 +254,7 @@ def calc_d(e: int, lambda_n: int) -> int:
 	:return: the decryption exponent.
 	"""
 
-	d=mod_inv(e, lambda_n)
-
-	return d
+	return mod_inv(e, lambda_n)
 
 
 def rsa_encrypt(m: int, e: int, n: int) -> int:
@@ -274,9 +271,7 @@ def rsa_encrypt(m: int, e: int, n: int) -> int:
 	:return: The ciphertext integer.
 	"""
 
-	c=pow(m, e, n)
-
-	return c
+	return pow(m, e, n)
 
 
 def rsa_decrypt(c: int, d: int, n: int) -> int:
@@ -292,11 +287,10 @@ def rsa_decrypt(c: int, d: int, n: int) -> int:
 	:return: the plaintext integer M.
 	"""
 
-	m=pow(c, d, n)
-	return m
+	return pow(c, d, n)
 
 
-def crt_e_maker(e: int, n_len: int = 256) -> tuple:
+def crt_e_maker(e: int, n_len: int = 256) -> tuple[int, int, int]:
 	"""
 	creates the value for e for the chinese remainder theory attack aka the
 	hastaad broadcast attack. It will make sure that n works with the provided
@@ -316,7 +310,7 @@ def crt_e_maker(e: int, n_len: int = 256) -> tuple:
 	return p,q,N
 
 
-def make_fermat_key(bit_width: int) -> tuple:
+def make_fermat_key(bit_width: int) -> tuple[int, int, int, int, int]:
 	"""
 	Makes a key that will allow it to be factored using fermat's factorization
 	technique. Then it will return p,q,n,e, and d.
@@ -326,20 +320,14 @@ def make_fermat_key(bit_width: int) -> tuple:
 	"""
 
 	from sympy import nextprime
-	prime_length = bit_width // 2
-	p=get_prime(prime_length)
-	q_len=(prime_length//4)//2
-	p_hex=hex(p).replace('L','')
-	zero_pad='0' * (len(p_hex) - q_len)
-	q=p_hex[0:q_len]+zero_pad
-	q=int(q,16)
-	q=nextprime(q)
-	n=p*q
-	e_len=(n&1) + 15
-	lambda_n=calc_lambda(p,q)
-	e=calc_e(e_len,lambda_n)
-	d= calc_d(e, lambda_n)
-	return p, q, n, e, d
+	pl = bit_width // 2
+	p=get_prime(pl)
+	q = nextprime(p+(1<<(pl//3)))
+	n = p*q
+	ln = calc_lambda(p, q)
+	e = calc_e(n & 1 and 9 or 8, ln)
+	d = calc_d(e,ln)
+	return n, p, q, e, d
 
 
 def make_fermat(bit_width):

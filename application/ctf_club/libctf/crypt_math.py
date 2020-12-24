@@ -15,20 +15,6 @@ def gcd_fast(a: int, b: int) -> tuple:
 	:return: gcd,x,y. Where x and y are bezout's coeffecients.
 	"""
 
-	gcd=0
-	x=0
-	y=0
-	x=0
-	"""
-	if a < 0:
-		sign_x=-1
-	else:
-		sign_x=1
-	if b < 0:
-		sign_y=-1
-	else:
-		sign_y=1
-	"""
 	#if a or b is zero return the other value and the coeffecient's accordingly.
 	if a==0:
 		return b, 0, 1
@@ -56,11 +42,6 @@ def mod_inv(a:int,mod:int) -> int:
 	:return: Int the modular mutiplicative inverse of a and m.
 	"""
 
-	gcd=0
-	x=0
-	y=0
-	x=0
-
 	#use the extended euclidean algorithm to calculate the gcd and also bezout's coeffecients x and y.
 	gcd, x, y = gcd_fast(a,mod)
 
@@ -80,7 +61,7 @@ def mod_inv(a:int,mod:int) -> int:
 		return x % mod
 
 
-def fast_lcm(a: int, b: int) -> object:
+def fast_lcm(a: int, b: int) -> int:
 	"""
 	a fast lcm calculator utilizing the extended euler algorithm.
 
@@ -89,9 +70,7 @@ def fast_lcm(a: int, b: int) -> object:
 	:return:
 	"""
 
-	lcm=0
-	gcd=0
-
+	from math import gcd
 	if a==0 or b==0:
 		return 0
 	elif a==1:
@@ -99,11 +78,8 @@ def fast_lcm(a: int, b: int) -> object:
 	elif b==1:
 		return a
 
-	gcd=gcd_fast(a,b)[0]
-	lcm=(a//gcd)*b
-
-	return lcm
-
+	g = gcd(a,b)
+	return (a//g)*b
 
 
 def det(a: list) -> int:
@@ -182,7 +158,6 @@ def matrix_mul(a: list, b: list, m: int = 0) -> list:
 	if len(a) != 2 and len(a[0]) != 2:
 		raise ValueError('Your matrix must be a 2x2')
 	if type(b) == list:
-		#>>> 'foo' if (a and b ) != 2 else 'bar'
 		if len(b) !=2 and len(b[0]) !=2 :
 			raise ValueError('Both matricies must be 2x2')
 		C[0][0] = (a[0][0] * b[0][0]) + (a[0][1] * b[1][0])
@@ -243,6 +218,7 @@ def affine_setup(string:str) -> tuple:
 	:param string: Input string.
 	:return: length of the string, and the numeric list.
 	"""
+
 	str_len=len(string)
 	numeric_str=make_numeric_list(string, str_len)
 
@@ -260,7 +236,6 @@ def affine_encrypt(input_str:str, a:int=None, b:int=None) -> str:
 	:return: The ciphertext.
 	"""
 
-	tmp=0
 	str_len,numeric_str = affine_setup(input_str)
 	coprimes=[1,3,5,7,9,11,15,17,19,21,23,25]
 	if a is None:
