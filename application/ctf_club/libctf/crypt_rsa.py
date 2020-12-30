@@ -154,11 +154,8 @@ def get_prime(prime_length:int) -> int:
 	"""
 
 	from secrets import randbits
-	from sympy import isprime,nextprime
-	num = randbits(prime_length)
-	if not isprime(num):
-		num = nextprime(num)
-	return num
+	from sympy import nextprime
+	return nextprime(randbits(prime_length))
 
 
 # creates and returns p,q, and N. of length prime_length
