@@ -51,13 +51,6 @@ def mod_inv(a:int,mod:int) -> int:
 		raise ValueError('Inputs are invalid. No modular multiplicative inverse exists between {} and {} gcd:{}.\n'.format(a,mod,gcd))
 	#otherwise do the inversion.
 	else:
-
-		"""if(sign_a != 1) and (sign_mod !=1):
-			return -1*((x+mod)%mod);
-		else:
-			return x%mod;
-			"""
-		#if m is negative do the following.
 		return x % mod
 
 
@@ -79,6 +72,7 @@ def fast_lcm(a: int, b: int) -> int:
 		return a
 
 	g = gcd(a,b)
+
 	return (a//g)*b
 
 
@@ -92,6 +86,7 @@ def det(a: list) -> int:
 	"""
 
 	d= (a[0][0] * a[1][1]) - (a[0][1] * a[1][0])
+
 	return d
 
 
@@ -120,6 +115,7 @@ def adj(a):
 	B[0][1]=-a[0][1]
 	B[1][0]=-a[1][0]
 	B[1][1]=a[0][0]
+
 	return B
 
 
@@ -236,18 +232,21 @@ def affine_encrypt(input_str:str, a:int=None, b:int=None) -> str:
 	:return: The ciphertext.
 	"""
 
-	str_len,numeric_str = affine_setup(input_str)
+	output_str = ''
 	coprimes=[1,3,5,7,9,11,15,17,19,21,23,25]
 	if a is None:
 		tmp=randint(0,11)
 		a=coprimes[tmp]
 	if b is None:
-		b=randint(1,26)
-	for i in range(str_len):
-		numeric_str[i]=((numeric_str[i]*a)+b) % 26
+		if a == 1:
+			b=randint(1,26)
+		else:
+			b = randint(2,26)
 
-	crypt_str= make_list_string(numeric_str, str_len)
-	return crypt_str
+	for c in input_str:
+		output_str += chr(((ord(c)*a)+b) % 26)
+
+	return output_str
 
 
 def affine_decrypt(input_str:str, a:int, b:int) -> str:
@@ -261,9 +260,8 @@ def affine_decrypt(input_str:str, a:int, b:int) -> str:
 	"""
 
 	a=mod_inv(a,26)
-	str_len, numeric_str = affine_setup(input_str)
-	for i in range(str_len):
-		numeric_str[i]=( a * (numeric_str[i] - b)) % 26
-	pt= make_list_string(numeric_str, str_len)
+	output_str = ''
+	for c in input_str:
+		output_str += chr(( a * (ord(c) - b) ) % 26)
 
-	return pt
+	return output_str

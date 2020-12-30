@@ -67,29 +67,20 @@ def naive_ascii_decode(encoded_number: str, length: int) -> str:
 
 	j=0
 	output_str=''
-	length=length-1
 
-	for i in range(0,length):
-		tmp=encoded_number[j]
-		if tmp == '1':
-			chars=3
-		else:
-			chars=2
-
-		tmp=encoded_number[j:j+chars]
-		val=int(tmp)
-
-		output_str=output_str+chr(val)
-		j=j+chars
-		if len(encoded_number[j:]) < 2:
-			break
+	while j <= length - 2:
+		tmp = encoded_number[j]
+		chars = (tmp == '1') and 3 or 2
+		tmp = encoded_number[j:j+chars]
+		output_str += chr(int(tmp))
+		j += chars
 
 	return output_str
 
 
 # Encodes any string of ASCII(7bit) characters into a number the way that Radford has
 # done it for the chal.
-def naive_ascii_encode(string_to_encode: str, string_length: int) -> str:
+def naive_ascii_encode(string_to_encode: str, string_length: int) -> int:
 	"""
 	Encodes an ASCII string with naive ascii encoding. Where each byte of
 	the string is encoded into the ASCII code point and then combined
@@ -100,16 +91,8 @@ def naive_ascii_encode(string_to_encode: str, string_length: int) -> str:
 	:return: The encoded string.
 	"""
 
-	output_str=''
+	return int(''.join(map(lambda x: str(ord(x)), string_to_encode)))
 
-	for i in range(0,string_length):
-		tmp=ord(string_to_encode[i:i+1])
-		tmp_str=str(tmp)
-		output_str=output_str+tmp_str
-
-	encoded_number=output_str
-
-	return encoded_number
 
 
 # this decodes a string of bytes(ASCII text only really otherwise you need to convert it
@@ -122,13 +105,12 @@ def rsa_ascii_encode(string_to_encode:str,string_length:int) -> int:
 	:param string_length: How many bytes the string is.
 	:return: The integer representation of this string.
 	"""
+
 	x=0
 	string_to_encode=string_to_encode[::-1]
 	i=0
-	while i<string_length:
-		tmp=ord(string_to_encode[i:i+1])
-		x+=(tmp*pow(256,i))
-		i+=1
+	for i,c in enumerate(string_to_encode):
+		x += (ord(c) * (1<<(8*i)))
 
 	return x
 
@@ -153,12 +135,11 @@ def rsa_ascii_decode(x:int,x_len:int) -> str:
 
 	while x>0:
 		X.append(int(x % 256))
-		x //=256
-	for i in range(x_len-len(X)):
-		X.append(0)
-	X=X[::-1]
-	for i in range(len(X)):
-		string+=chr(X[i])
+		x >>= 8
+	X += ([0]*(x_len-len(X)))
+	X.reverse()
+	for item in X:
+		string+=chr(item)
 
 	return string
 
@@ -175,7 +156,7 @@ def get_prime(prime_length:int) -> int:
 	from secrets import randbits
 	from sympy import isprime,nextprime
 	num = randbits(prime_length)
-	while not isprime(num):
+	if not isprime(num):
 		num = nextprime(num)
 	return num
 
@@ -194,8 +175,13 @@ def calc_n(prime_length:int) -> tuple[int, int, int]:
 	:param prime_length: The number of bits that the value N should be.
 	:return:
 	"""
-	prime_length = prime_length // 2
-	p=get_prime(prime_length)
+	if prime_length & 1:
+		p = get_prime(prime_length//2)
+		prime_length = (prime_length // 2) + 1
+	else:
+		prime_length = prime_length //2
+		p = get_prime(prime_length)
+
 	q=get_prime(prime_length)
 	while p == q:
 		q=get_prime(prime_length)
@@ -327,6 +313,7 @@ def make_fermat_key(bit_width: int) -> tuple[int, int, int, int, int]:
 	ln = calc_lambda(p, q)
 	e = calc_e(n & 1 and 9 or 8, ln)
 	d = calc_d(e,ln)
+
 	return n, p, q, e, d
 
 
@@ -340,6 +327,7 @@ def make_fermat(bit_width):
 	"""
 
 	p,q,n,e,d = make_fermat_key(bit_width)
+
 	return p,q,n,e,d
 
 
@@ -355,6 +343,7 @@ def make_pubkey(n: int, e: int) -> str:
 	from Crypto.PublicKey import RSA
 	key=RSA.construct((n,e))
 	key_str=key.exportKey().decode('utf-8')
+
 	return key_str
 
 
@@ -372,4 +361,5 @@ def make_privkey(n: int,e: int,d: int) -> str:
 	from Crypto.PublicKey import RSA
 	key=RSA.construct((n,e,d))
 	key_str=key.exportKey().decode('utf-8')
+
 	return key_str

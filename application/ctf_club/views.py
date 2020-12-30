@@ -35,7 +35,7 @@ def is_ratelimited(request):
 
 
 # Create your views here.
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 # @ratelimit(key='ip',rate='20/m')
 def profile(request,username):
 	return render(request,'control_panel.html')
@@ -47,7 +47,7 @@ def index(request):
 	chals= make_index(challenges)
 	return render(request,"index.html",{'objects':chals})
 
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 @ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
 @ratelimit(key='post:username',rate='5/m',method=ratelimit.UNSAFE)
 def login_view(request):
@@ -158,7 +158,7 @@ def challenge_view(request,challenge_id):
 	return JsonResponse(resp)
 
 
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 @ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
 def register(request):
 	signup_valid = True
@@ -282,12 +282,12 @@ def solve(request,challenge_id):
 
 
 @login_required(login_url="login")
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 def challenge_hint(request,challenge_id):
 	pass
 
 
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 def hint(request,hint_id):
 	if request.user.is_authenticated:
 		unlocked = HintsUnlocked.objects.filter(hint_id=hint_id,user_id=request.user.id)
@@ -303,7 +303,7 @@ def hint(request,hint_id):
 
 
 @login_required(login_url="login")
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 @user_tfa_valid
 def control_panel(request,username):
 	msg = ''
@@ -359,7 +359,7 @@ def solves(request,username = ''):
 
 
 @login_required(login_url="login")
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 @user_tfa_valid
 def challenge_admin(request):
 	#for the sorting of the challenges later.
@@ -410,7 +410,8 @@ def challenge_admin(request):
 			old_solves.delete()
 
 		else:
-
+			print(category)
+			Categories.objects.get(name=category)
 			challenge = Challenges.objects.create(
 				name = name,
 				description = description,
@@ -588,7 +589,7 @@ def leaderboard(request):
 
 
 @ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 def captcha(request):
 	captcha_msg = ''
 	error = False
@@ -647,7 +648,7 @@ def file(request,filename):
 
 # TFA related views.
 @login_required(login_url='login')
-@require_http_methods(["GET"])
+@require_http_methods("GET")
 def tfa_qr_code(request):
 	domain = request.get_host()
 	if not domain:
@@ -663,7 +664,7 @@ def tfa_qr_code(request):
 
 
 @login_required(login_url='login')
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 def tfa_enable(request):
 	if request.method == "GET":
 		has_tfa_enabled = request.user.tfa_enabled
@@ -691,7 +692,7 @@ def tfa_enable(request):
 
 
 @login_required()
-@require_http_methods(["GET","POST"])
+@require_http_methods(("GET","POST"))
 def verify_tfa(request):
 	if request.method == "GET":
 
@@ -721,7 +722,7 @@ def about(request):
 
 
 @login_required()
-@require_http_methods(["GET"])
+@require_http_methods("GET")
 @user_tfa_valid
 def admin_leaderboard(request):
 	if not (request.user.is_staff or request.user.is_superuser):

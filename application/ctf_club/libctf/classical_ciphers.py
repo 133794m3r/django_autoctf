@@ -40,6 +40,7 @@ def make_hill(plaintext: str, variety: int) -> tuple:
 	else:
 		description+=f"""<p> From your assistant Watson you realize that the message starts with {crib}.</p>
 """
+
 	return description,flag
 
 
@@ -68,6 +69,7 @@ def make_affine(plaintext: str, variety: int) -> tuple:
 {ct}
 </p>
 	"""
+
 	if variety == 0:
 		description+=f"""You were able to find the 2 numbers scrawled on the back of the page. <pre>{a},{b}</pre>"""
 	else:

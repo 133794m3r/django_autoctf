@@ -156,16 +156,16 @@ class Hints(models.Model):
 	def to_dict(self):
 		return {'id':self.id,'challenge_name':self.challenge.name,'description':self.description,'level':self.level}
 
-from ratelimitbackend.backends import RateLimitModelBackend
-
-class MyBackend(RateLimitModelBackend):
-	minutes = 5
-	requests = 10
-
-	def key(self, request, dt):
-		return '%s%s-%s-%s' % (
-			self.cache_prefix,
-			self.get_ip(request),
-			request.POST['username'],
-			dt.strftime('%Y%m%d%H%M'),
-		)
+# from ratelimitbackend.backends import RateLimitModelBackend
+#
+# class MyBackend(RateLimitModelBackend):
+# 	minutes = 5
+# 	requests = 10
+#
+# 	def key(self, request, dt):
+# 		return '%s%s-%s-%s' % (
+# 			self.cache_prefix,
+# 			self.get_ip(request),
+# 			request.POST['username'],
+# 			dt.strftime('%Y%m%d%H%M'),
+# 		)

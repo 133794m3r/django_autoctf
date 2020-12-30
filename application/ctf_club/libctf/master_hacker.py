@@ -21,6 +21,7 @@ def maximum_tuple(tuples:tuple, start:int=0):
 		if cur > maximum:
 			maximum = cur
 			index = i
+
 	return index
 
 
@@ -90,6 +91,7 @@ def make_tuples(number_of_items: int, max_storage: int) -> list:
 	max_value = max_storage // 2
 	for i in range(number_of_items + 1):
 		tuples.append((randint(10, max_storage), randint(1, max_value)))
+
 	return tuples
 
 
@@ -116,6 +118,7 @@ def make_filenames(number_of_items: int) -> list:
 		k = randint(0, item_suffixes_len)
 		filename = '{1}-{0}.{2}'.format(i, item_prefixes[j], item_suffixes[k])
 		filenames.append(filename)
+
 	return filenames
 
 

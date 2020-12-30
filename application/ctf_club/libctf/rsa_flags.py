@@ -1,5 +1,7 @@
 #  Macarthur Inbody <admin-contact@transcendental.us>
 #  Licensed under LGPLv3 Or Later (2020)
+from math import ceil
+
 from .crypt_rsa import *
 
 
@@ -16,26 +18,27 @@ def make_rsa(plaintext: str) -> tuple:
 	"""
 
 	pt_len = len(plaintext)
-	M = int(naive_ascii_encode(plaintext, pt_len))
-	prime_length = (pt_len * 15) + 1
+	M = naive_ascii_encode(plaintext, pt_len)
+	prime_length = ceil((M.bit_length()+1) *1.25)
 	p, q, N = calc_n(prime_length)
 	l_n = calc_lambda(p, q)
-	e = calc_e(10, l_n)
+	e = calc_e(prime_length >= 64 and 16 or 12, l_n)
+	d = calc_d(e,l_n)
 	C = rsa_encrypt(M, e, N)
-	C = hex(C).replace('L', '')
-	e = hex(e).replace('L', '')
-	N = hex(N).replace('L', '')
+	C = hex(C)
+	d = hex(d)
+	N = hex(N)
 	description = f"""<p>You see a strange message popup on neppit as you're scrolling through your feed it looks interesting
 so you click on it. It leads to you to two files one a text file and the other an encrypted disk image....</p>
 <p>
 As you open up the file you see the message below come across your screen.
 </p>
 <p>
-Recalling your prior training you know that e is the exponent, n is the modulus, and that C is the ciphertext.
+Recalling your prior training you know that d is the private key exponent, n is the modulus, and that C is the ciphertext.
 The message seems important, the only hint you're given is that the message is encoded with a naive form.
 </p>
 <p class="text-monospace">
-e={e}<br />
+d={d}<br />
 C={C}<br />
 n={N}<br />
 </p>
@@ -61,7 +64,7 @@ def make_hba(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (m_len * 9) + 1
+	n_len = (M.bit_length()+1) *1.25
 	e = 3
 	p, q, n1 = crt_e_maker(e, n_len)
 	c1 = rsa_encrypt(M, e, n1)
@@ -73,12 +76,12 @@ def make_hba(plaintext: str) -> tuple:
 	c3 = rsa_encrypt(M, e, n3)
 
 	# The code below makes sure that python doesn't append an "L" to the end of the hex encoded number.
-	c3 = hex(c3).replace('L', '')
-	c2 = hex(c2).replace('L', '')
-	c1 = hex(c1).replace('L', '')
-	n1 = hex(n1).replace('L', '')
-	n2 = hex(n2).replace('L', '')
-	n3 = hex(n3).replace('L', '')
+	c3 = hex(c3)
+	c2 = hex(c2)
+	c1 = hex(c1)
+	n1 = hex(n1)
+	n2 = hex(n2)
+	n3 = hex(n3)
 
 	description = f"""<p>You were enjoying your leftover Chinese food minding your own business watching reruns of Broadcast tv when your buddy sent you a message. He managed to intercept some secret communications. The messages were encrypted with RSA he's managed to get your the ciphertexts and also the public key components below.</p>
 <p>He heard it's from the secretive group calling themselves "The Transcendentalists"</p>
@@ -96,6 +99,7 @@ n3:{n3}<br />
 <br />
 <p>Here's a free hint. Factoring n is not going to help you, Wolfram Alpha also cannot deal with numbers this large. So you need to try something else. This challenge uses the naive encoding instead of the normal encoding that this algorithm generally uses.</p>
 	"""
+
 	return description, plaintext
 
 
@@ -113,17 +117,17 @@ def make_common_mod(plaintext: str) -> tuple:
 
 	e_len = 32
 	m_len = len(plaintext)
-	M = int(naive_ascii_encode(plaintext, m_len))
-	n_len = (m_len * 15) + 1
+	M = naive_ascii_encode(plaintext, m_len)
+	n_len = (M.bit_length+1) * 1.25
 	p, q, n = calc_n(n_len)
 	l_n = calc_lambda(p, q)
 	e1 = calc_e(e_len, l_n)
 	c1 = rsa_encrypt(M, e1, n)
-	c1 = hex(c1).replace('L', '')
+	c1 = hex(c1)
 	e2 = calc_e(e_len, l_n)
 	c2 = rsa_encrypt(M, e2, n)
-	c2 = hex(c2).replace('L', '')
-	n = hex(n).replace('L', '')
+	c2 = hex(c2)
+	n = hex(n)
 	description = f"""<p>The Transcendentalists have given you another challenge. This time they want you to give them the secret phrase. Once again they say this is Elementary for you to solve.</p>
 <br />
 <br />
@@ -146,6 +150,7 @@ Also "The Elementalists" used naive ASCII encoding instead of the standard RSA e
 The flag is the original plaintext message.
 </p>
 """
+
 	return description, plaintext
 
 
@@ -162,7 +167,7 @@ def make_bsa(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (m_len * 9) + 1
+	n_len = (M.bit_length()+1) *1.25
 	p, q, n = calc_n(n_len)
 	l_n = calc_lambda(p, q)
 	e = calc_e(16, l_n)
@@ -171,12 +176,12 @@ def make_bsa(plaintext: str) -> tuple:
 	M_fake = (M * pow(r, e)) % n
 	S = pow(M_fake, d, n)
 	S_fake = (S * mod_inv(r, n)) % n
-	M_fake = hex(M_fake).replace('L', '')
-	S_fake = hex(S_fake).replace('L', '')
-	n = hex(n).replace('L', '')
-	M = hex(M).replace('L', '')
-	e = hex(e).replace('L', '')
-	S = hex(S).replace('L', '')
+	M_fake = hex(M_fake)
+	S_fake = hex(S_fake)
+	n = hex(n)
+	M = hex(M)
+	e = hex(e)
+	S = hex(S)
 	description = f"""
 <p>The Transcendentalists want you to forge a signature on the message "Use hashes to mitigate Blind Signing Attacks". They have thankfully let you send your message to their signing server to have it signed.</p>
 <p>You and your friend already setup a blinded signature now it's up to you to get the signature on the original message.</p>
@@ -201,6 +206,7 @@ M={M_fake}
 S={S}
 </p>
 ==============="""
+
 	flag = S_fake
 	return description, flag
 
@@ -216,12 +222,12 @@ def make_fermat_chal(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (m_len * 9) + 1
+	n_len = (M.bit_length()+1)*1.25
 	p, q, n, e, d = make_fermat(n_len)
 	C = rsa_encrypt(M, e, n)
-	C = hex(C).replace('L', '')
-	e = hex(e).replace('L', '')
-	n = hex(n).replace('L', '')
+	C = hex(C)
+	e = hex(e)
+	n = hex(n)
 	description = f"""<p>our friend told you about a group called the Transcendentalists. They gave you a challenge to get into their group. They say the answer is simply "Elementary". They want you to decrypt the message they gave you. </p>
 <p>When you see that the key is {n_len}bits in length they still tell you "It's Elementary my dear Watson." and refuse to say anything more.</p>
 
@@ -233,4 +239,5 @@ n = {n}<br />
 <br />
 Free hint. This plaintext was encoded with OS2IP.
 """
+
 	return description, plaintext

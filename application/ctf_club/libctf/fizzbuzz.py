@@ -1,6 +1,4 @@
 
-
-
 def make_fizzbuzz(start: int, end: int) -> tuple:
 	"""
 	Makes a challenge based upon a basic fizzbuzz challenge for the users to try to solve.
