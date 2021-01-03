@@ -1,9 +1,10 @@
 # Django AutoCTF
 This repo is broken up into 2 folders. One for the django application, and one for the database/server configurations.
 
-## 
+## Running Locally
 If you are running it just locally w/o a DB server comment out the postgres section and uncomment the sqlite file.
-
+## SECRET KEY
+Make sure that you run the script ``generate_secret_key.py`` in the ``server_files`` folder. If you don't the thing **WILL NOT RUN**.
 ## Installation Locally/Server
 The instructions below don't assume you're going to use a virtual environment. It's up to you chose if you want to have one.
 
