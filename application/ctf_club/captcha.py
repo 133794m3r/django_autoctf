@@ -73,7 +73,7 @@ def img_captcha():
 		text += charset[randint(0, chars)]
 
 	font_size = 26
-	fnt = ImageFont.truetype('SourceCodePro-Bold.otf', font_size)
+	fnt = ImageFont.truetype('DejaVuSansMono-Bold.ttf', font_size)
 	size = fnt.getsize(text)
 	width = (size[0] // len(text))
 	size = (int(size[0] + (width * 1.2)), int(font_size * 1.5))
@@ -121,32 +121,7 @@ def generate_captchas(request: object) -> tuple:
 	time = datetime.utcnow() + timedelta(seconds=45)
 	# print(time.timestamp())
 	request.session['captcha_expires'] = time.timestamp()
-	correct_letters, color_name, img_str = img_captcha()
-	math_msg, correct_ans = simple_math()
-	request.session['correct_letters'] = correct_letters
-	request.session['captcha_answer'] = correct_ans
-	request.session['captcha_valid'] = False
-
-	return math_msg,color_name,img_str
-
-
-def check_captchas(request: object, user_letters: str, user_math_ans: int) -> bool:
-	"""
-	This function will check the answers provided by the user against the values
-	stored for their session. If they answer it correctly then it sets the
-	captcha expires to be 1m from this time. This is mainly for the login form
-	because it means that the user doesn't have to solve another captcha for this
-	amount of time if they become rate-limited again.
-
-	:param request: The UWSGI Request Object.
-	:param user_letters: The letters the user provided.
-	:param user_math_ans: The answer the user provided to us.
-	:return:
-	"""
-
-	math_msg = ''
-	color_name = ''
-	img_str = ''
+	correct_letters, color_name, img_str = img_str = ''
 	#print(request.session['captcha_answer'], user_math_ans, request.session['correct_letters'], user_letters)
 	if request.session['captcha_answer'] == user_math_ans and request.session['correct_letters'] == user_letters:
 		request.session['captcha_valid'] = True
