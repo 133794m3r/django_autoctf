@@ -12,7 +12,7 @@ LGPLv3 or Later (2019 - 2020)
 # common modulus attack. All you need to supply is both exponents, both cipher-
 # texts. Then the common Modulus.
 from .crypt_math import *
-
+from typing import Tuple
 
 def calc_r(n:int ) -> int:
 	"""
@@ -165,7 +165,7 @@ def get_prime(prime_length:int) -> int:
 # This could be done via built-in C functions but it's best to visualize
 # how it's working so people understand it.
 
-def calc_n(prime_length:int) -> tuple[int, int, int]:
+def calc_n(prime_length:int) -> Tuple[int, int, int]:
 	"""
 	Creates and returns p,q, and N of length prime_length.
 
@@ -273,7 +273,7 @@ def rsa_decrypt(c: int, d: int, n: int) -> int:
 	return pow(c, d, n)
 
 
-def crt_e_maker(e: int, n_len: int = 256) -> tuple[int, int, int]:
+def crt_e_maker(e: int, n_len: int = 256) -> Tuple[int, int, int]:
 	"""
 	creates the value for e for the chinese remainder theory attack aka the
 	hastaad broadcast attack. It will make sure that n works with the provided
@@ -293,7 +293,7 @@ def crt_e_maker(e: int, n_len: int = 256) -> tuple[int, int, int]:
 	return p,q,N
 
 
-def make_fermat_key(bit_width: int) -> tuple[int, int, int, int, int]:
+def make_fermat_key(bit_width: int) -> Tuple[int, int, int, int, int]:
 	"""
 	Makes a key that will allow it to be factored using fermat's factorization
 	technique. Then it will return p,q,n,e, and d.
