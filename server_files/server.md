@@ -1,5 +1,6 @@
 # Setting up the Server
 The files in here are to help you in setting up your server.
+This assumes that all files from the "application" folder live in /var/www/capstone_project. If they live elsewhere be sure to adjust the configs in nginx accordingly.
 ## Nginx
 Move the nginx.conf to your nginx.conf directory(use locate to find it on linux).
 This is the nginx.config that I'm basically running myself.

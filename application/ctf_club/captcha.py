@@ -118,7 +118,6 @@ def generate_captchas(request: object) -> tuple:
 	"""
 
 	time = datetime.utcnow() + timedelta(seconds=45)
-	# print(time.timestamp())
 	request.session['captcha_expires'] = time.timestamp()
 	correct_letters, color_name, img_str = img_captcha()
 	math_msg, correct_ans = simple_math()
@@ -145,7 +144,6 @@ def check_captchas(request: object, user_letters: str, user_math_ans: int) -> bo
 	math_msg = ''
 	color_name = ''
 	img_str = ''
-	#print(request.session['captcha_answer'], user_math_ans, request.session['correct_letters'], user_letters)
 	if request.session['captcha_answer'] == user_math_ans and request.session['correct_letters'] == user_letters:
 		request.session['captcha_valid'] = True
 		#If they solve it then they don't have to try to do another one for a good while. 1m feels like long enough.

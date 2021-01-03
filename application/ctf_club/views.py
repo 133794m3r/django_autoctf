@@ -410,7 +410,6 @@ def challenge_admin(request):
 			old_solves.delete()
 
 		else:
-			print(category)
 			Categories.objects.get(name=category)
 			challenge = Challenges.objects.create(
 				name = name,

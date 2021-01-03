@@ -63,7 +63,6 @@ def user_tfa_valid(view_func):
 	def _wrapped_view(request, *args, **kwargs):
 		#only check it if the user has been authenticated.
 		if request.user.is_authenticated:
-			print(request.user.tfa_enabled, request.session.get("verified_tfa",False))
 			#then check if they haven't enabled TFA no reason to require them to do it or to check the session variable.
 			if request.user.tfa_enabled is False:
 				return view_func(request,*args,**kwargs)

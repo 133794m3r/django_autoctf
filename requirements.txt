@@ -4,6 +4,6 @@ pyotp~=2.4.1
 django_ratelimit~=3.0.1
 qrcode~=6.1
 Pillow~=8.0.1
-pycryptodome~=3.9.9
+pycryptodomex~=3.9.7
 psycopg2-binary~=2.8.6
 python-memcached~=1.59

@@ -158,13 +158,9 @@ def make_masterhacker():
 
 	#max_tuple = bagged[max_tuple_index]
 	max_tuple_fname = filenames[max_tuple_index]
-	#print("The max tuple was {} and it's filename was {}".format(max_tuple, max_tuple_fname))
-
 	chal_msg += "&lt;FILENAME OF HIGHEST VALUED ITEM&gt;;&lt;#_of_items&gt;;(&lt;total_value&gt;,&lt;total_storage_used&gt;)"
 	val, stg = total_value(bagged, max_storage)
 
-	#print('\ntv:{0}, wt:{1}'.format(val, stg))
-	#print("\n{};{};({},{})\n".format(max_tuple_fname, len(bagged), val, stg))
 	flag = f"""{max_tuple_fname};{len(bagged)};({val},{stg})"""
 
 	#Now making the test-case for them.

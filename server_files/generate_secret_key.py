@@ -14,4 +14,3 @@ with open(file_prefix+'secret_key.txt','w') as fh:
 	# or 384bits of total randomness. Could be raw bytes but I want to see it.
 	# for now anyways.
 	fh.write(token_urlsafe(64))
-
