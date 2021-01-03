@@ -3,8 +3,9 @@ from secrets import token_urlsafe
 from os import getcwd
 ""
 CWD = getcwd()
-if CWD == "sever_files":
-	file_prefix = "../"
+file_prefix = ""
+if "server_files" in CWD:
+	file_prefix = "../application/"
 elif CWD == "application":
 	file_prefix = ""
 
