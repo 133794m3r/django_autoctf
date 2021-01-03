@@ -25,18 +25,17 @@ ALLOWED_HOSTS = []
 # SECURITY WARNING: keep the secret key used in production secret!
 # Also make sure that you generate your own secret_key
 try:
-	with open('secret_key.txt','r') as f:
+	with open('secret_key.txt','rb') as f:
 		SECRET_KEY = f.read().strip()
 except FileNotFoundError:
-	# FOR DEVELOPMENT ONLY THIS KEY SHOULD NEVER BE VALID ON A LIVE SITE!
-	# USE THE SCRIPT! it is in server_files/generate_secret_token.py. That script
-	# Should be utilized so that this won't ever be hit.
-	SECRET_KEY = 'KA7r3N2Tz9QIivMM8-AajrmYoJ3TztL6PgpohNG5iBLBMujOvNh2KAe-2h5zgE3GUUk'
-	print("THIS SHOULDN'T BE RUNNING IN PRODUCTION! JESUS CHRIST WHAT ARE YOU DOING!")
-	print("SERIOUSLY! THIS BETTER NOT BE IN PRODUCTION!")
-	if DEBUG == False or DEBUG is None:
-		raise SystemError("\nTHIS SHOULDN'T BE RUN IN PRODUCTION! DEBUG OFF THIS CODE WAS HIT!\n RUN generate_secret_token.py SCRIPT NOW!\n")
+	# For development uncomment next line and comment out 3 below.
+	# SECRET_KEY = 'KA7r3N2Tz9QIivMM8-AajrmYoJ3TztL6PgpohNG5iBLBMujOvNh2KAe-2h5zgE3GUUk'
 
+	#comment out the next 4 lines for dev environments when you don't want the secret key file being wrote to.
+	from secrets import token_urlsafe
+	SECRET_KEY = token_urlsafe(60)
+	with open('secret_key.txt','wb') as f:
+		f.write(SECRET_KEY)
 
 # Application definition
 
