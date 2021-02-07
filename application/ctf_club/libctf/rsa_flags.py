@@ -64,7 +64,7 @@ def make_hba(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (M.bit_length()+1) *1.25
+	n_len = ceil((M.bit_length()+1) *1.25)
 	e = 3
 	p, q, n1 = crt_e_maker(e, n_len)
 	c1 = rsa_encrypt(M, e, n1)
@@ -118,7 +118,7 @@ def make_common_mod(plaintext: str) -> tuple:
 	e_len = 32
 	m_len = len(plaintext)
 	M = naive_ascii_encode(plaintext, m_len)
-	n_len = (M.bit_length+1) * 1.25
+	n_len = ceil((M.bit_length()+1) * 1.25)
 	p, q, n = calc_n(n_len)
 	l_n = calc_lambda(p, q)
 	e1 = calc_e(e_len, l_n)
@@ -167,7 +167,7 @@ def make_bsa(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (M.bit_length()+1) *1.25
+	n_len = ceil((M.bit_length()+1) *1.25)
 	p, q, n = calc_n(n_len)
 	l_n = calc_lambda(p, q)
 	e = calc_e(16, l_n)
@@ -222,7 +222,7 @@ def make_fermat_chal(plaintext: str) -> tuple:
 
 	m_len = len(plaintext)
 	M = rsa_ascii_encode(plaintext, m_len)
-	n_len = (M.bit_length()+1)*1.25
+	n_len = ceil((M.bit_length()+1)*1.25)
 	p, q, n, e, d = make_fermat(n_len)
 	C = rsa_encrypt(M, e, n)
 	C = hex(C)

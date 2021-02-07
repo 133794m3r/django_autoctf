@@ -149,18 +149,22 @@ function modal_challenge(event,challenge_type,edit){
 function modal_hint(element,edit=true){
 	const hint_id = parseInt(element.dataset.id);
 	document.getElementById('add_hint_modal').dataset.backdrop = 'static';
-	document.getElementById('add_hint_modal_title').innerText = (hint_id !== 0) ? "Edit Hint" : "Add Hint";
 	document.getElementById("hint_challenge_name").value = element.dataset.cn;
-	document.getElementById('submit_hint').innerText = (hint_id !== 0) ? "Edit Hint" : "Add Hint";
+	document.getElementById("hint_challenge_name").dataset.id = element.dataset.id;
 	document.getElementById('submit_hint').disabled = (hint_id === 0)
 	if(edit) {
 		document.getElementById("hint_description").value = document.getElementById(`${hint_id}-desc`).innerHTML;
 		document.getElementById('hint_id').value = hint_id;
 		document.getElementById('hint_level').value = element.dataset.lvl;
+		document.getElementById('submit_hint').innerText = "Edit Hint";
+		document.getElementById('add_hint_modal_title').innerText = "Edit Hint";
 	}
 	else{
 		document.getElementById("hint_description").value = "";
 		document.getElementById('hint_id').value = 0;
+		document.getElementById("submit_hint").innerText = "Add Hint";
+		document.getElementById('add_hint_modal_title').innerText = "Add Hint";
+
 	}
 	$('#add_hint_modal').modal("toggle");
 
@@ -237,11 +241,12 @@ function submit_challenge(){
 		points = points + (5 - (points % 5));
 	}
 	content['points'] = points;
+	console.log(sn);
 	if(sn === 'fizzbuzz'){
 		let min = parseInt(document.getElementById('min').value);
 		let max = parseInt(document.getElementById('max').value);
-		content['min'] = (min < 2 || min > 1200)?undefined:min
-		content['max'] = (max < 1201 || max > 3000)?undefined:max
+		content['min'] = (min < 2 || min > 1200)?1:min
+		content['max'] = (max < 1201 || max > 3000)?1255:max
 	}
 	else if(chal.category !== "Programming"){
 		content['plaintext'] = document.getElementById('plain_text').value;
@@ -250,7 +255,7 @@ function submit_challenge(){
 		}
 	}
 	content['edit'] = document.getElementById('editing').checked;
-
+	console.log(content);
 	submit('/admin/challenge',content,response=>{
 		//Eventually I'll actually use this data to update the local challenge data but that's not for now.
 		// It's for a later thing. For now I just log the response. In the end I'll actually use the response to edit the
@@ -300,6 +305,7 @@ function get_challenge_info(challenge_type,variety=-1){
 				tmp['flag'] = chal.flag;
 				tmp['variety'] = chal.variety;
 				tmp['edit'] = chal.edit;
+				tmp['id'] = chal.id?chal.id:undefined;
 				return tmp;
 			}
 		}
@@ -360,12 +366,15 @@ function set_challenge_info(new_info,challenge_type,variety = -1){
  */
 function fetch_challenge_hints(name,full=false){
 	let challenge_name
+	let id;
 	if(full === false) {
 		if (CHALLENGES[name].variety) {
 			challenge_name = `${CHALLENGES[name].name} - 0`
+			id = get_challenge_info(name,0).id;
 		}
 		else{
-			challenge_name = CHALLENGES[name].name;		
+			challenge_name = CHALLENGES[name].name;
+			id = CHALLENGES[name].id;
 		}
 	}
 	else{
@@ -373,20 +382,25 @@ function fetch_challenge_hints(name,full=false){
 		if(CHALLENGES[name].variety){
 			const variety = document.getElementById('variety').value;
 			challenge_name = `${CHALLENGES[name].name} - ${variety}`;
+			id = get_challenge_info(name,parseInt(variety)).id;
 		}
 		else {
 			challenge_name = CHALLENGES[name].name;
+			id = CHALLENGES[name].id;
 		}
 	}
 	let challenge_name_enc = encodeURI(challenge_name);
-	get(`/admin/challenge/hints/${challenge_name_enc}/`,resp=>{
+	//get(`/admin/challenge/hints/${challenge_name_enc}/`,resp=>{
+	get(`/admin/challenge/hints/${id}/`,resp=>{
 		console.log(resp);
 		const len = parseInt(resp.len);
 		let content = ''
 		document.getElementById('hint_modal_title').innerText = `${challenge_name} : Hints`;
 		if(len === 0){
 			name = CHALLENGES[name].name;
-			document.getElementById('add_hint').dataset.cn = challenge_name;
+			let el = document.getElementById('add_hint');
+			el.dataset.cn = challenge_name;
+			el.dataset.id = id;
 		}
 		else if(len === 1){
 			document.getElementById('add_hint').dataset.cn = resp.hints.challenge_name;

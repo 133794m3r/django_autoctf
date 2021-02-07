@@ -104,12 +104,6 @@ def login_view(request):
 				login(request,user)
 				request.session['require_captcha'] = False
 				request.session['captcha_valid'] = False
-
-				# if user.tfa_enabled:
-				# 	request.session['verified_tfa'] = True
-				# 	return HttpResponseRedirect(reverse("verify_tfa"))
-				# else:
-				# 	return HttpResponseRedirect(reverse("index"))
 				return HttpResponseRedirect(reverse("index"))
 			else:
 				valid = False
@@ -137,7 +131,7 @@ def challenge_view(request,challenge_id):
 	if request.user.is_authenticated:
 		solved = False if Solves.objects.filter(user_id=request.user.id,challenge_id=challenge_id).count() == 0 else True
 
-	#If they've already solved it might as well show them the flag.
+		#If they've already solved it might as well show them the flag.
 		if solved:
 			chal = Challenges.objects.values('id','name','description','points','flag',"files__filename").get(id=challenge_id)
 		else:
@@ -245,13 +239,15 @@ def solve(request,challenge_id):
 		ratelimited = True
 	else:
 		challenge = Challenges.objects.filter(pk=challenge_id).first()
+		if challenge is None:
+			return Http404()
 		data = json_decode(request.body)
 
 		#Make sure that all matches are case-insensitve for simplicty's sake.
 		answer = data['answer'].upper()
 		correct_flag = challenge.flag.upper()
 		points = challenge.points
-		solved = Solves.objects.filter(user=request.user,challenge_id=challenge_id).first()
+		solved = Solves.objects.get(user=request.user,challenge_id=challenge_id).first()
 		#if they have solved something don't do anything else.
 		if solved:
 			was_solved = True
@@ -410,7 +406,6 @@ def challenge_admin(request):
 			old_solves.delete()
 
 		else:
-			Categories.objects.get(name=category)
 			challenge = Challenges.objects.create(
 				name = name,
 				description = description,
@@ -432,9 +427,8 @@ def challenge_admin(request):
 		base_challenges = []
 		varieties_used = {}
 		for challenge in challenges:
-
 			#Remove the - {VARIETY} part.
-			#This is a hack until I modify the model to incldue the "variety" flag.
+			#This is a hack until I modify the model to include the "variety" flag.
 			if '-' in challenge.name and challenge.name[-1].isdigit():
 				tmp_name = challenge.name[:-4]
 				variety = int(challenge.name[-1])
@@ -447,9 +441,11 @@ def challenge_admin(request):
 				challenges_used.append(indexed)
 				challenge_template = CHALLENGES_TEMPLATES[indexed]
 				chal_obj = {
-					'name': tmp_name, 'category': challenge.category.name, 'full_description': challenge.description,
-					'description': challenge_template['description'], 'sn': challenge_template['sn'],
-					'edit': True, 'flag': challenge.flag, 'can_have_files':challenge_template['files'],'variety':challenge_template['variety']}
+					'id':challenge.id, 'name': tmp_name, 'category': challenge.category.name,
+					'full_description': challenge.description, 'description': challenge_template['description'],
+					'sn': challenge_template['sn'], 'edit': True, 'flag': challenge.flag,
+					'can_have_files':challenge_template['files'], 'variety':challenge_template['variety']
+					}
 				if variety is not None:
 					if varieties_used.get(indexed):
 						varieties_used[indexed].append(variety)
@@ -527,30 +523,41 @@ def get_all_solves(request):
 
 @login_required(login_url="login")
 @require_http_methods(["POST","GET"])
-def hint_admin(request,challenge_name):
+def hint_admin(request, challenge_identifier):
 	if not (request.user.is_staff or request.user.is_superuser):
 		return JsonResponse({'OK':False})
 	elif not request.user.tfa_enabled:
 		return JsonResponse({'OK':False})
 
+	try:
+		challenge_identifier = int(challenge_identifier)
+		challenge_id = Challenges.objects.filter(pk=challenge_identifier).values("id").first()['id']
+	except ValueError:
+		challenge_id = Challenges.objects.filter(name=challenge_identifier).values("id").first()['id']
+
+	if challenge_id is None:
+			return JsonResponse({"OK":False})
 	if request.method == "POST":
 		content = json_decode(request.body)
 		if content['id'] == 0:
 			new_hint = Hints.objects.create(
 				description=content['description'],
 				level=content['level'],
-				challenge_id = Challenges.objects.get(name=challenge_name).id
+				challenge_id = challenge_id
 			)
 			new_hint.save()
+			return JsonResponse({'OK':True})
 		else:
-			edit_hint = Hints.objects.get(pk=content['id'])
-			edit_hint.description = content['description']
-			edit_hint.level = content['level']
-			edit_hint.save()
-
-		return JsonResponse({'OK':True})
+			edit_hint = Hints.objects.filter(pk=content['id']).first()
+			if edit_hint is not None:
+				edit_hint.description = content['description']
+				edit_hint.level = content['level']
+				edit_hint.save()
+				return JsonResponse({'OK':True})
+			else:
+				return JsonResponse({"OK":False})
 	else:
-		challenge_hints = Hints.objects.filter(challenge__name=challenge_name)
+		challenge_hints = Hints.objects.filter(challenge_id = challenge_identifier)
 		num_hints = challenge_hints.count()
 		challenge_hints = jsonify_queryset(challenge_hints)
 	return JsonResponse({'hints':challenge_hints,'len':num_hints})

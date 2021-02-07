@@ -2,6 +2,9 @@
 #  Licensed under LGPLv3 Or Later (2020)
 from random import randint
 
+from .lib import *
+
+
 def make_encoded_msg(length: int = 3) -> tuple:
 	"""
 

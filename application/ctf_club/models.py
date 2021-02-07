@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
-from ctf_club.util import jsonify_queryset
+from .util import jsonify_queryset
 
 """
 CTFClub Project
@@ -26,7 +26,10 @@ class User(AbstractUser):
 
 class Categories(models.Model):
 	name = models.CharField(max_length=50)
-
+	class Meta:
+		indexes = [
+			models.Index(fields=['name'])
+		]
 	def to_dict(self):
 		return {'id':self.id,'name':self.name}
 
