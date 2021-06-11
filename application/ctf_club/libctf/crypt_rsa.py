@@ -108,7 +108,6 @@ def rsa_ascii_encode(string_to_encode:str,string_length:int) -> int:
 
 	x=0
 	string_to_encode=string_to_encode[::-1]
-	i=0
 	for i,c in enumerate(string_to_encode):
 		x += (ord(c) * (1<<(8*i)))
 
@@ -130,11 +129,11 @@ def rsa_ascii_decode(x:int,x_len:int) -> str:
 	X = []
 	string=''
 	#max_len=len(x)
-	if x>=pow(256,x_len):
+	if x>= (1<<(8*x_len)):
 		raise ValueError('Number is too large to fit in output string.')
 
 	while x>0:
-		X.append(int(x % 256))
+		X.append(x % 256)
 		x >>= 8
 	X += ([0]*(x_len-len(X)))
 	X.reverse()

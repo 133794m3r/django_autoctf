@@ -12,6 +12,7 @@ Licensed AGPLv3 Or later (2020)
 
 # User model is just here so I can reference it, I use the default model.
 class User(AbstractUser):
+	id = models.IntegerField(primary_key=True)
 	points = models.IntegerField(default=0)
 	tfa_enabled = models.BooleanField(default=False)
 	tfa_secret = models.CharField(max_length=32,default=None)
@@ -25,6 +26,7 @@ class User(AbstractUser):
 
 
 class Categories(models.Model):
+	id = models.IntegerField(primary_key=True)
 	name = models.CharField(max_length=50)
 	class Meta:
 		indexes = [
@@ -44,6 +46,7 @@ class Categories(models.Model):
 
 
 class Files(models.Model):
+	id = models.IntegerField(primary_key=True)
 	filename = models.TextField()
 
 	def __len__(self):
@@ -60,6 +63,7 @@ class Files(models.Model):
 		return {'id':self.id,'filename':self.filename}
 
 class Challenges(models.Model):
+	id = models.IntegerField(primary_key=True)
 	category = models.ForeignKey('Categories',on_delete=models.CASCADE,related_name='category')
 	points = models.IntegerField()
 	name = models.CharField(max_length=50)
@@ -88,6 +92,7 @@ class Challenges(models.Model):
 
 
 class Solves(models.Model):
+	id = models.IntegerField(primary_key=True)
 	challenge = models.ForeignKey('Challenges',on_delete=models.CASCADE,related_name='solves')
 	user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='solves')
 	timestamp = models.DateTimeField(default=timezone.now)
@@ -124,6 +129,7 @@ class Solves(models.Model):
 # Better way may be to have multiple tables so that I can avoid full table scans as it is a many-to-many
 # Relationship but I'll leave it be for now.
 class HintsUnlocked(models.Model):
+	id = models.IntegerField(primary_key=True)
 	user = models.ForeignKey('User',on_delete=models.CASCADE)
 	hint = models.ForeignKey('Hints',on_delete=models.CASCADE)
 
@@ -141,6 +147,7 @@ class HintsUnlocked(models.Model):
 
 
 class Hints(models.Model):
+	id = models.IntegerField(primary_key=True)
 	challenge = models.ForeignKey('Challenges',on_delete=models.CASCADE,related_name='hints')
 	description = models.TextField()
 	level = models.IntegerField()

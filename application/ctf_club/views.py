@@ -176,7 +176,10 @@ def register(request):
 		confirmation=request.POST.get("password_confirm")
 		user_math_ans = request.POST.get("year")
 		user_letters = request.POST.get("letters")
-		password_score = int(request.POST.get("password_score",0))
+		try:
+			password_score = int(request.POST.get("password_score",0))
+		except ValueError:
+			password_score = 255
 		check_captchas(request,user_letters,user_math_ans)
 
 
@@ -209,6 +212,7 @@ def register(request):
 					request.session.pop('captcha_answer')
 					return HttpResponseRedirect(reverse("index"))
 				except IntegrityError:
+					
 					signup_valid = False
 					message = message+"Username must be unique."
 

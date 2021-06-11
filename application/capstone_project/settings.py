@@ -40,14 +40,13 @@ except FileNotFoundError:
 # Application definition
 
 INSTALLED_APPS = [
-	'ctf_club',
-	#'django.contrib.admin',
+#	'ctf_club',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
-#	'ctf_club.apps.CtfClubConfig',
+	'ctf_club.apps.CtfClubConfig',
 	'ctf_club.apps.RateLimitedAdminConfig'
 ]
 
