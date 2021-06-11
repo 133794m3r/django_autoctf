@@ -653,8 +653,14 @@ def captcha(request):
 
 @login_required(login_url="login")
 def file(request,filename):
-	return FileResponse(open(f'files/{filename}','rb'))
-
+	import os.path
+	path = os.path.normpath(os.path.join('file',filename))
+	if not path.startswith('file'):
+		return HttpResponse(reason='Directory Traversal Not Allowed',status=403)
+	if os.path.exists(path):
+		return FileResponse(path)
+	else:
+		return HttpResponse(reason="File doesn't exist",status=404)
 
 # TFA related views.
 @login_required(login_url='login')
