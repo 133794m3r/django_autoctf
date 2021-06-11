@@ -656,11 +656,12 @@ def file(request,filename):
 	import os.path
 	path = os.path.normpath(os.path.join('file',filename))
 	if not path.startswith('file'):
-		return HttpResponse(reason='Directory Traversal Not Allowed',status=403)
-	if os.path.exists(path):
+		return HttpResponse(reason='Malformed filename.',status=403)
+	if os.path.exists(path) and os.path.isfile(path):
 		return FileResponse(path)
 	else:
-		return HttpResponse(reason="File doesn't exist",status=404)
+		return HttpResponse(reason="File doesn't exist.",status=404)
+
 
 # TFA related views.
 @login_required(login_url='login')
