@@ -211,8 +211,8 @@ def register(request):
 					request.session.pop('correct_letters')
 					request.session.pop('captcha_answer')
 					return HttpResponseRedirect(reverse("index"))
-				except IntegrityError:
-					
+				except IntegrityError as e:
+					print(e)
 					signup_valid = False
 					message = message+"Username must be unique."
 
