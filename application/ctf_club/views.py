@@ -7,17 +7,22 @@ from json import loads as json_decode
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http404, FileResponse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http404, FileResponse, HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 # ratelimiter
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
+from django_ratelimit import UNSAFE
 
 from .captcha import check_captchas, generate_captchas
 from .totp import TotpAuthorize, user_tfa_valid
 
+#re-adding the lost method
+def __is_ajax(obj):
+	return obj.headers.get('X-Requested-With') == 'XMLHttpRequest'
+HttpRequest.is_ajax = __is_ajax
 """
 CTFClub Project
 By Macarthur Inbody <admin-contact@transcendental.us>
@@ -48,8 +53,8 @@ def index(request):
 	return render(request,"index.html",{'objects':chals})
 
 @require_http_methods(("GET","POST"))
-@ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
-@ratelimit(key='post:username',rate='5/m',method=ratelimit.UNSAFE)
+@ratelimit(key='ip',rate='30/m',method=UNSAFE)
+@ratelimit(key='post:username',rate='5/m',method=UNSAFE)
 def login_view(request):
 	if is_ratelimited(request):
 		if request.session.get('require_captcha',False):
@@ -153,7 +158,7 @@ def challenge_view(request,challenge_id):
 
 
 @require_http_methods(("GET","POST"))
-@ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
+@ratelimit(key='ip',rate='30/m',method=UNSAFE)
 def register(request):
 	signup_valid = True
 	if request.user.is_authenticated:
@@ -386,6 +391,9 @@ def challenge_admin(request):
 				description, flag, files = CHALLENGE_FUNCS[content['sn']]()
 			else:
 				description,flag = CHALLENGE_FUNCS[content['sn']]()
+		elif category == "Programing Interactive":
+			chal_index = CHALLENGES_TEMPLATES_NAMES[name][1]
+			description,flag = CHALLENGE_FUNCS[content['sn']]()
 		else:
 			plaintext = content['plaintext']
 			if content['sn'] in ["affine","hill"]:
@@ -486,6 +494,8 @@ def challenge_admin(request):
 		new_chals = sorted(base_challenges,key=itemgetter('category','sn','name'))
 		return render(request,"challenge_admin.html", {"challenges":new_chals,
 		                                               'json':json_encode(all_challenges)})
+
+
 
 
 @login_required(login_url="login")
@@ -598,13 +608,13 @@ def leaderboard(request):
 	return render(request,"leaderboard.html",{"ranks":user_ranks})
 
 
-@ratelimit(key='ip',rate='30/m',method=ratelimit.UNSAFE)
+@ratelimit(key='ip',rate='30/m',method=UNSAFE)
 @require_http_methods(("GET","POST"))
 def captcha(request):
 	captcha_msg = ''
 	error = False
 	ratelimited = False
-
+	msg = ''
 	if request.method == "POST":
 		if is_ratelimited(request):
 			ratelimited = True
@@ -749,3 +759,71 @@ def admin_leaderboard(request):
 	user_ranks = rank_users(top_users)
 
 	return render(request,"admin_leaderboard.html",{"ranks":user_ranks})
+
+
+def top_secret_test(request):
+	if request.method == "GET":
+		return render(request,"prog_challenge.html")
+	else:
+		import requests
+		from json import loads
+		if request.is_ajax():
+			data = json_decode(request.body)
+			solution = """
+			"""
+			good_code = """
+import sys
+
+from fizzbuzz import fizzbuzz
+
+def __fizzbuzz_solution(n):
+	sum15 = 0
+	sum5 = 0
+	sum3 = 0
+	for i in range(1,n+1):
+		if i % 15 == 0:
+			sum15 +=1
+			sum5 += 1
+			sum3 += 1
+		elif i % 5 == 0:
+			sum5 += 1
+		elif i % 3 == 0:
+			sum3 += 1
+
+	return sum3,sum5,sum15
+
+results = []
+for test in map(int, sys.argv[1:]):
+	correct = __fizzbuzz_solution(test)
+	answer = fizzbuzz(test)
+	results.append( [ 1 if correct == answer else 0,test,[*answer],[*correct] ])
+
+print(results)"""
+			req_data = {'language':'py3','version':'3.10','stdin':'','args':[1,10,20,30], 'files':[
+				{'name':'main.py','content':good_code},
+				 {'name':'fizzbuzz.py','content':data['code']},
+			]}
+			r = requests.post('https://emkc.org/api/v2/piston/execute', json=req_data)
+			run  = r.json()
+			print(run)
+			output = loads(run['run']['output'])
+			total = 0
+			total_c = 0
+			for correct,test_num,given_answer,correct_answer in output:
+				total += 1
+				if correct:
+					total_c += 1
+
+			return JsonResponse({'score':total_c/total,'correct':total_c,'total':total})
+
+@login_required(login_url='login')
+@require_http_methods(("GET","POST"))
+@user_tfa_valid
+def programming_admin(request):
+	return render(request,'prog_challenge.html')
+
+@login_required(login_url='login')
+@require_http_methods(("GET","POST"))
+@user_tfa_valid
+def top_secret(request):
+	return render(request,'top_secret.html')

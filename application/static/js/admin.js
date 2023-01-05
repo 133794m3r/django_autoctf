@@ -28,31 +28,34 @@ function modal_challenge(event,challenge_type,edit){
 	switch(challenge_type) {
 		//only fizzbuzz is weird for right now. In the future it'll be more generalized.
 		case "fizzbuzz":
-		 //Code like the one below makes me thing I should've done it in react's JSX.
-		 inner_content = `<div class="col-6">
-			<div class="modal-input input-group mb-3">
-				<div class="input-group-prepend">
-					<label for="min" class="input-group-text">
-					Min
-					</label>
+			 //Code like the one below makes me thing I should've done it in react's JSX.
+			 inner_content = `<div class="col-6">
+				<div class="modal-input input-group mb-3">
+					<div class="input-group-prepend">
+						<label for="min" class="input-group-text">
+						Min
+						</label>
+					</div>
+					<input type="number" name="min" id="min" min="3" max="1200" class="input_items numbers"/>
 				</div>
-				<input type="number" name="min" id="min" min="3" max="1200" class="input_items numbers"/>
-			</div>
-			<div class="modal-input input-group mb-3">
-				<div class="input-group-prepend">
-					<label for="max" class="input-group-text">
-					Max
-					</label>
+				<div class="modal-input input-group mb-3">
+					<div class="input-group-prepend">
+						<label for="max" class="input-group-text">
+						Max
+						</label>
+					</div>
+					<input type="number" name="max" id="max" min="1201" max="3000" class="input_items numbers"/>
 				</div>
-				<input type="number" name="max" id="max" min="1201" max="3000" class="input_items numbers"/>
-			</div>
-		</div>`;
-		 flag = chal.flag;
-		 if(flag !== ''){
-		 	full_description = chal.full_description + `<p>The flag was ${flag}.</p>`
-		 }
-		break;
-
+			</div>`;
+			 flag = chal.flag;
+			 if(flag !== ''){
+				full_description = chal.full_description + `<p>The flag was ${flag}.</p>`
+			 }
+			break;
+		case 'programming':
+			console.log('asdf');
+			document.location = '/admin/programming';
+			break;
 		 default:
 			flag = chal.flag;
 			let variety = 0;

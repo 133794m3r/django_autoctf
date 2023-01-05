@@ -166,7 +166,7 @@ class Hints(models.Model):
 	def to_dict(self):
 		return {'id':self.id,'challenge_name':self.challenge.name,'description':self.description,'level':self.level}
 
-# from ratelimitbackend.backends import RateLimitModelBackend
+# from django_ratelimitbackend.backends import RateLimitModelBackend
 #
 # class MyBackend(RateLimitModelBackend):
 # 	minutes = 5
@@ -179,3 +179,27 @@ class Hints(models.Model):
 # 			request.POST['username'],
 # 			dt.strftime('%Y%m%d%H%M'),
 # 		)
+
+#Seperate table to hold the data specific to programming challenges only
+class ProgChallenges(models.Model):
+	id = models.AutoField(primary_key=True)
+	challenge_id = models.ForeignKey('Challenges',related_name='challenges',on_delete=models.CASCADE)
+	solution_code = models.TextField(max_length=4096)
+	input_data = models.TextField(max_length=256)
+	challenge_generator = models.TextField(max_length=4096)
+
+class ProgLanguages(models.Model):
+	id = models.AutoField(primary_key=True)
+	name = models.CharField(max_length=256)
+	short_code = models.CharField(max_length=32)
+
+
+
+#The base code table with all of it's specific bits in place
+class ProgChallengeBaseCode(models.Model):
+	id = models.AutoField(primary_key=True)
+	challenge_id = models.ForeignKey('Challenges',on_delete=models.CASCADE)
+	code = models.TextField(max_length=4096)
+	lang = models.ForeignKey('ProgLanguages',on_delete=models.CASCADE)
+
+

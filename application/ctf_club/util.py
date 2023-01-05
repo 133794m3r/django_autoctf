@@ -40,7 +40,7 @@ CHALLENGE_FUNCS = {
 	"byteme":make_byteme,
 }
 
-CATEGORIES = ["Classical Crypto","Modern Crypto","Programming"]
+CATEGORIES = ["Classical Crypto","Modern Crypto","Programming","Programming Interactive"]
 
 #TODO: Move all of this into an SQL table that'll actually hold this meta-data for me.
 
@@ -86,14 +86,17 @@ CHALLENGES_TEMPLATES = [
 	{"name": "Back to BASEcs with th EBS", "sn": "byteme", "category": "Programming",
 	 "description": "This challenge requires the user decode a hex encoded string that has each byte separated by some padding character.",
 	 "points": 60, "variety": False, "files": True},
+	{"name":"Programming Challenges", "sn":"programming", "category":"Programming Interactive", "description":
+		"""This is the category for all programming challenges.""",
+	 "points":75, "variety":False,"files":True},
 ]
 
 
 def __func():
-	CHALLENGES_TEMPLATES_NAMES = {}
+	CHALLENGES_TEMPLATES_NAME = {}
 	for i,chal in enumerate(CHALLENGES_TEMPLATES):
-		CHALLENGES_TEMPLATES_NAMES[chal['name']] = [chal['sn'],i]
-	return CHALLENGES_TEMPLATES_NAMES
+		CHALLENGES_TEMPLATES_NAME[chal['name']] = [chal['sn'],i]
+	return CHALLENGES_TEMPLATES_NAME
 
 
 CHALLENGES_TEMPLATES_NAMES = __func()

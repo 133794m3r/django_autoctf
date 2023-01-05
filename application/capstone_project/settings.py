@@ -21,21 +21,25 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+import mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
+mimetypes.add_type("text/css",".css")
 ALLOWED_HOSTS = []
 # SECURITY WARNING: keep the secret key used in production secret!
 # Also make sure that you generate your own secret_key
-try:
-	with open('secret_key.txt','rb') as f:
-		SECRET_KEY = f.read().strip()
-except FileNotFoundError:
+#try:
+#	with open('secret_key.txt','rb') as f:
+#		SECRET_KEY = f.read().strip()
+
+#except FileNotFoundError:
 	# For development uncomment next line and comment out 3 below.
-	# SECRET_KEY = 'KA7r3N2Tz9QIivMM8-AajrmYoJ3TztL6PgpohNG5iBLBMujOvNh2KAe-2h5zgE3GUUk'
+SECRET_KEY = 'KA7r3N2Tz9QIivMM8-AajrmYoJ3TztL6PgpohNG5iBLBMujOvNh2KAe-2h5zgE3GUUk'
 
 	#comment out the next 4 lines for dev environments when you don't want the secret key file being wrote to.
-	from secrets import token_urlsafe
-	SECRET_KEY = token_urlsafe(60)
-	with open('secret_key.txt','wb') as f:
-		f.write(SECRET_KEY)
+	#from secrets import token_urlsafe
+	#SECRET_KEY = token_urlsafe(60)
+	#with open('secret_key.txt','wb') as f:
+	#	f.write(SECRET_KEY)
 
 # Application definition
 
@@ -65,7 +69,7 @@ ROOT_URLCONF = 'capstone_project.urls'
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
-		'DIRS': [os.path.join(BASE_DIR, 'templates'),os.path.join(BASE_DIR,'ctf_club/templates')]
+		'DIRS': [os.path.join(BASE_DIR,'ctf_club/templates')]
 		#'DIRS': []
 		,
 		'APP_DIRS': True,
@@ -89,29 +93,29 @@ WSGI_APPLICATION = 'capstone_project.wsgi.application'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-"""
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.sqlite3',
 		'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 	},
 
-}"""
+}
 #Uncomment the line below to have it run from postgres(as I am on the server.)
 #and set the username and password to whatever you want it to be.
-psql_user = os.getenv("PSQL_USER")
-psql_pass = os.getenv("PSQL_PASS")
+#psql_user = os.getenv("PSQL_USER")
+#psql_pass = os.getenv("PSQL_PASS")
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'ctf_club',
-		'USER': psql_user,
-		'PASSWORD': psql_pass,
-		'HOST': 'localhost',
-		'PORT': '5432',
-	}
-}
+# DATABASES = {
+# 	'default': {
+# 		'ENGINE': 'django.db.backends.postgresql',
+# 		'NAME': 'ctf_club',
+# 		'USER': psql_user,
+# 		'PASSWORD': psql_pass,
+# 		'HOST': 'localhost',
+# 		'PORT': '5432',
+# 	}
+# }
 
 AUTH_USER_MODEL = "ctf_club.User"
 
@@ -140,12 +144,14 @@ AUTH_PASSWORD_VALIDATORS = [
 	},
 ]
 
+"""
 CACHES = {
 	'default': {
 		'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
 		'LOCATION': '127.0.0.1:11211',
 	}
-}
+	
+}"""
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

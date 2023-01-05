@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
 
 
 class RateLimitedAdmin(admin.AdminSite):

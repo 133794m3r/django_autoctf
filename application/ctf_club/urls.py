@@ -30,4 +30,7 @@ urlpatterns = [
 	path("about",views.about,name="about"),
 	path("admin/leaderboard",views.admin_leaderboard,name="admin_leaderboard"),
 	path("leaderboard",views.leaderboard,name="leaderboard"),
+	path("top_secret",views.top_secret,name="top_secret"),
+	path("top_secret_test",views.top_secret_test,name="top_secret_test"),
+	path("admin/programming",views.programming_admin,name="programming_admin"),
 ]

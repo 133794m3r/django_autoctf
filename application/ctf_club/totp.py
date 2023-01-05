@@ -68,10 +68,10 @@ def user_tfa_valid(view_func):
 				return view_func(request,*args,**kwargs)
 
 			#check if the user has not been verified.
-			elif request.session.get('verified_tfa', False) is False:
-				from django.http import HttpResponseRedirect
-				from django.urls import reverse
-				return HttpResponseRedirect(reverse('verify_tfa'))
+			# elif request.session.get('verified_tfa', False) is False:
+			# 	from django.http import HttpResponseRedirect
+			# 	from django.urls import reverse
+			# 	return HttpResponseRedirect(reverse('verify_tfa'))
 			#they've already been verified apparently.
 			else:
 				return view_func(request, *args, **kwargs)
