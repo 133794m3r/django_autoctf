@@ -774,9 +774,9 @@ def top_secret_test(request):
 			good_code = """
 import sys
 
-from fizzbuzz import fizzbuzz
 
-def __fizzbuzz_solution(n):
+
+def fizzbuzz(n):
 	sum15 = 0
 	sum5 = 0
 	sum3 = 0
@@ -794,27 +794,43 @@ def __fizzbuzz_solution(n):
 
 results = []
 for test in map(int, sys.argv[1:]):
-	correct = __fizzbuzz_solution(test)
-	answer = fizzbuzz(test)
-	results.append( [ 1 if correct == answer else 0,test,[*answer],[*correct] ])
+	print(fizzbuzz(test))
+	
 
-print(results)"""
-			req_data = {'language':'py3','version':'3.10','stdin':'','args':[1,10,20,30], 'files':[
-				{'name':'main.py','content':good_code},
-				 {'name':'fizzbuzz.py','content':data['code']},
-			]}
+"""
+
+			req_data = {'language':'py3','version':'3.10.0','stdin':'','args':[1,10,20,30], 'files':[{'name':'main.py','content':good_code}]}
+
 			r = requests.post('https://emkc.org/api/v2/piston/execute', json=req_data)
 			run  = r.json()
 			print(run)
-			output = loads(run['run']['output'])
-			total = 0
-			total_c = 0
-			for correct,test_num,given_answer,correct_answer in output:
-				total += 1
-				if correct:
-					total_c += 1
+			solutions = run['run']['output']
+			if data['language'] == 0:
+				req_data['language'] = 'py3'
+				req_data['version'] = '3.10.0'
+			else:
+				req_data['language'] = 'javascript'
+				req_data['version'] = '16.3.0'
+				req_data['files'][0]['name'] = 'main.js'
 
-			return JsonResponse({'score':total_c/total,'correct':total_c,'total':total})
+			req_data['files'][0]['content'] = data['code']
+
+			r = requests.post('https://emkc.org/api/v2/piston/execute', json=req_data)
+			run  = r.json()
+			print(run)
+			user_answers = run['run']['output']
+			if run['run']['stderr'] != '' or run['run']['code'] != 0:
+				return JsonResponse({'score':0,'errors':run['run']['stderr']})
+			else:
+				total = 0
+				total_c = 0
+				for solution,user_answer in solutions,user_answers:
+					total += 1
+					if solution == user_answer:
+						total_c += 1
+
+
+				return JsonResponse({'score':total_c/total})
 
 @login_required(login_url='login')
 @require_http_methods(("GET","POST"))
