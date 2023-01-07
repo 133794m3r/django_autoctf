@@ -25,23 +25,20 @@ class TotpAuthorize:
 		"""
 		return self.totp.now()
 
-	def valid(self, token:object) -> bool:
+	def valid(self, token:str) -> bool:
 		"""
 
-		:param token: The token we're going to check. It's either a string or an integer.
+		:param token: The token we're going to check..
 		:return: True if the token or the previous one is valid else False.
 		"""
-		token = int(token)
 		now = datetime.datetime.now()
 		prior_time = now + datetime.timedelta(seconds=-30)
-		try:
-			valid_now = self.totp.verify(token)
-			valid_past = self.totp.verify(token, for_time=prior_time)
-			return valid_now or valid_past
-		except:
-			return False
+		valid_now = self.totp.verify(token)
+		valid_past = self.totp.verify(token, for_time=prior_time)
+		return valid_now or valid_past
 
-	def qrcode(self, username) -> object:
+
+	def qrcode(self, username:str) -> object:
 		"""
 
 		:param username:The username of the token.

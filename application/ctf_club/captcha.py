@@ -73,7 +73,7 @@ def img_captcha():
 		text += charset[randint(0, chars)]
 
 	font_size = 26
-	fnt = ImageFont.truetype('DejaVuSansMono-Bold.ttf', font_size)
+	fnt = ImageFont.truetype('SourceCodePro-Bold.otf', font_size)
 	size = fnt.getsize(text)
 	width = (size[0] // len(text))
 	size = (int(size[0] + (width * 1.2)), int(font_size * 1.5))

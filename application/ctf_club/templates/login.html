@@ -53,21 +53,43 @@ Licensed AGPLv3 Or later (2020)
     <h2>Login</h2>
 
     {% if message %}
-        <div>{{ message }}</div>
+        <div class="alert-danger col-md-5 pl-0">
+				<div class="alert alert-warn alert-dismissible fade show" role="alert" id="alert_item">
+					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				  {{ message }}
+				</div>
+		  </div>
     {% endif %}
 
-    <form action="{% url 'login' %}" method="post" id="login">
+    <form action="{% url 'login' %}" method="post" id="login" class="col-3">
         {% csrf_token %}
-        <div class="form-group">
-			  <label>
-				  <input autofocus class="form-control" type="text" name="username" placeholder="Username">
-			  </label>
+        <div class="input-group">
+			  <div for="username" class="input-group-prepend">
+				  <label for="username">
+				  <span class="input-group-text" id="username">Username</span>
+				  </label>
+			  </div>
+				  <input autofocus id="username" class="form-control" type="text" name="username" placeholder="Username" aria-describedby="username"/>
+
 		  </div>
-        <div class="form-group">
-			  <label>
-				  <input class="form-control" type="password" name="password" placeholder="Password">
-			  </label>
+        <div class="input-group">
+			  <div for="password" class="input-group-prepend">
+					  <label for="password">
+						  <span class="input-group-text">Password:</span>
+					  </label>
+			  </div>
+				  <input id="password" class="form-control" type="password" name="password" placeholder="Password">
 		  </div>
+	 	<div class="input-group">
+			<div class="input-group-prepend">
+				<label for="2fa">
+					<span class="input-group-text">
+					Two Factor:
+					</span>
+				</label>
+			</div>
+				<input id="2fa" class="form-control" type="number" name="token" placeholder="Code. If setup" max="999999"/>
+		</div>
 			<div class="input-group mb-3 row" id="solved_it" hidden="true" aria-hidden="true">
 				<div class="col-md-12">
 					<h3>Captcha Already Solved</h3>
@@ -109,6 +131,7 @@ Licensed AGPLv3 Or later (2020)
 						<button type="button" class="btn btn-secondary" id="check_captcha" >Check Captcha</button>
 					</div>
 				</div>
+	 			<input name="next_url" type="hidden" value="{{ request.GET.next }}" />
         <input class="btn btn-primary" type="submit" value="Login">
     </form>
 

@@ -104,19 +104,35 @@ def login_view(request):
 
 		if valid:
 			user = authenticate(request,username=username,password=password)
-
+			request.session['failed_logins'] = request.session.get('failed_logins',0) + 1
 			if user is not None:
 				login(request,user)
 				request.session['require_captcha'] = False
 				request.session['captcha_valid'] = False
-				return HttpResponseRedirect(reverse("index"))
+				if user.tfa_enabled:
+					totp_authorizer = TotpAuthorize(user.tfa_secret)
+					if totp_authorizer.valid(request.POST.get('token')):
+						request.session['verified_tfa'] = True
+					else:
+						return HttpResponseRedirect(reverse("verify_tfa")+'?next='+request.POST.get('next_url'))
+
+				from django.utils.http import url_has_allowed_host_and_scheme
+				nxt = request.POST.get("next_url")
+				if nxt and url_has_allowed_host_and_scheme(url=nxt,allowed_hosts={request.get_host()},require_https=request.is_secure()):
+					return HttpResponseRedirect(nxt)
+				else:
+					return HttpResponseRedirect(reverse("index"))
+
 			else:
 				valid = False
 				message += "Invalid username and/or password."
+		if request.session.get('failed_logins',0) > 2:
+			request.session['require_captcha'] = True
+			show_captcha = True
 
-		if not valid:
+		if not valid and show_captcha:
 			captcha_msg, color_name, img_str = generate_captchas(request)
-			return render(request,"login.html",{"message":message,"captcha_msg":captcha_msg,"color_name":color_name,"img_str":img_str,"show_captcha":show_captcha})
+		return render(request,"login.html",{"message":message,"captcha_msg":captcha_msg,"color_name":color_name,"img_str":img_str,"show_captcha":show_captcha})
 	else:
 		if request.session.get('require_captcha',False):
 			captcha_msg,color_name,img_str = generate_captchas(request)
@@ -728,7 +744,7 @@ def verify_tfa(request):
 		else:
 			return render(request,"verify_tfa.html")
 	else:
-		if request.is_ajax():
+		if request.headers['Content-Type'] == 'application/json':
 			token = json_decode(request.body).get('token')
 		else:
 			token = request.POST.get('token')
@@ -736,10 +752,15 @@ def verify_tfa(request):
 		totp_authorizer = TotpAuthorize(request.user.tfa_secret)
 		if totp_authorizer.valid(token):
 			request.session['verified_tfa'] = True
-			if request.is_ajax():
-				return JsonResponse({'token_invalid':True})
+			if request.headers['Content-Type'] == 'application/json':
+				return JsonResponse({'token_invalid':False})
 			else:
-				return HttpResponseRedirect(reverse('index'))
+				from django.utils.http import url_has_allowed_host_and_scheme
+				nxt = request.POST.get("next_url")
+				if nxt and url_has_allowed_host_and_scheme(url=nxt,allowed_hosts={request.get_host()},require_https=request.is_secure()):
+					return HttpResponseRedirect(nxt)
+				else:
+					return HttpResponseRedirect(reverse("index"))
 		else:
 			return render(request,"verify_tfa.html",{"token_invalid":True})
 
