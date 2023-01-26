@@ -859,8 +859,8 @@ for test in map(int, sys.argv[1:]):
 def programming_admin(request):
 	return render(request,'prog_challenge.html')
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 @require_http_methods(("GET","POST"))
-@user_tfa_valid
+#@user_tfa_valid
 def top_secret(request):
 	return render(request,'top_secret.html')

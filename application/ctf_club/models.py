@@ -10,7 +10,7 @@ By Macarthur Inbody <admin-contact@transcendental.us>
 Licensed AGPLv3 Or later (2020)
 """
 
-# User model is just here so I can reference it, I use the default model.
+# User model is just here, so I can reference it, I use the default model.
 class User(AbstractUser):
 	id = models.AutoField(primary_key=True)
 	points = models.IntegerField(default=0)
@@ -112,7 +112,7 @@ class Solves(models.Model):
 		return 1
 
 
-# Was going to make this it's own table but honestly why. It's a single field and should be part of the challenge itself.
+# Was going to make this its own table but honestly why. It's a single field and should be part of the challenge itself.
 # this way it can be easily removed.
 # class TotalSolves(models.Model):
 # 	challenge = models.ForeignKey('Challenges',on_delete=models.CASCADE)
@@ -127,7 +127,7 @@ class Solves(models.Model):
 
 # Unbelievably unperformant way of using this but oh well.
 # Better way may be to have multiple tables so that I can avoid full table scans as it is a many-to-many
-# Relationship but I'll leave it be for now.
+# Relationship, but I'll leave it be for now.
 class HintsUnlocked(models.Model):
 	id = models.AutoField(primary_key=True)
 	user = models.ForeignKey('User',on_delete=models.CASCADE)
@@ -181,21 +181,30 @@ class Hints(models.Model):
 # 		)
 
 #Seperate table to hold the data specific to programming challenges only
-class ProgChallenges(models.Model):
-	id = models.AutoField(primary_key=True)
-	challenge_id = models.ForeignKey('Challenges',related_name='challenges',on_delete=models.CASCADE)
-	solution_code = models.TextField(max_length=4096)
-	input_data = models.TextField(max_length=256)
-	challenge_generator = models.TextField(max_length=4096)
 
 class ProgLanguages(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=256)
 	short_code = models.CharField(max_length=32)
 
+class ProgChallenges(models.Model):
+	challenge_id = models.OneToOneField('Challenges',related_name='challenge',on_delete=models.CASCADE)
+	type = models.SmallIntegerField()
 
+class ProgChallengeInputs(models.Model):
+	prog_challenge_id = models.OneToOneField('ProgChallenges',on_delete=models.CASCADE)
+	input = models.TextField()
 
-#The base code table with all of it's specific bits in place
+class ProgChallengeSolutions(models.Model):
+	prog_challenge_id = models.OneToOneField('ProgChallenges',on_delete=models.CASCADE)
+	code = models.TextField(max_length=4096)
+
+class ProgChallengeGenerators(models.Model):
+	prog_challenge_id = models.OneToOneField('ProgChallenges',related_name='prog_challenge',on_delete=models.CASCADE)
+	code = models.TextField(max_length=4096)
+	lang = models.ForeignKey('ProgLanguages',on_delete=models.CASCADE)
+
+#The base code table with all of its specific bits in place
 class ProgChallengeBaseCode(models.Model):
 	id = models.AutoField(primary_key=True)
 	challenge_id = models.ForeignKey('Challenges',on_delete=models.CASCADE)
