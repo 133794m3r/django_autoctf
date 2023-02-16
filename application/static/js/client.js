@@ -9,7 +9,7 @@
  *
  * Will fetch a challenge for you based upon it's id.
  *
- * @param {int} challenge_id
+ * @param {string} challenge_id
  */
 function fetch_chal(challenge_id){
 	get(`/challenge/${challenge_id}`,resp=>{
@@ -47,7 +47,7 @@ function fetch_chal(challenge_id){
 			cols += '</div>'
 			document.getElementById('description').insertAdjacentHTML('beforeend', cols);
 		}
-		else if(challenge.files == undefined){
+		else if(challenge.files === undefined){
 			document.getElementById('description').insertAdjacentHTML('beforeend','<div class="row mb-2"><div class="col-12 text-center mt-3"><h2>Files</h2></div><div class=\'col-12 text-center mt-3\'>As a guest user, you can\'t view any files.</div>');
 		}
 		const answer_el = document.getElementById('answer');

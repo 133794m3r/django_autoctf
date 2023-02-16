@@ -7,6 +7,7 @@ from json import loads as json_decode
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.db.models import F
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse, Http404, FileResponse, HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
@@ -48,8 +49,9 @@ def profile(request,username):
 @ratelimit(key='ip',rate='1/s')
 @user_tfa_valid
 def index(request):
-	challenges=Challenges.objects.all()
+	challenges=Challenges.objects.values('id','name','category__name')
 	chals= make_index(challenges)
+
 	return render(request,"index.html",{'objects':chals})
 
 @require_http_methods(("GET","POST"))
@@ -784,7 +786,7 @@ def admin_leaderboard(request):
 
 def top_secret_test(request):
 	if request.method == "GET":
-		return render(request,"prog_challenge.html")
+		return render(request, "new_chal_admin.html")
 	else:
 		import requests
 		from json import loads
@@ -857,7 +859,7 @@ for test in map(int, sys.argv[1:]):
 @require_http_methods(("GET","POST"))
 @user_tfa_valid
 def programming_admin(request):
-	return render(request,'prog_challenge.html')
+	return render(request, 'new_chal_admin.html')
 
 #@login_required(login_url='login')
 @require_http_methods(("GET","POST"))

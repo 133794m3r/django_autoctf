@@ -53,8 +53,8 @@ function modal_challenge(event,challenge_type,edit){
 			 }
 			break;
 		case 'programming':
-			console.log('asdf');
 			document.location = '/admin/programming';
+			return;
 			break;
 		 default:
 			flag = chal.flag;

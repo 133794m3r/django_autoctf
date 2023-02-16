@@ -1,3 +1,5 @@
+# Massive Rewrite underway
+Rewrite underway to make this into a standard CTF platform. Will rewrite all of the backend slowly from the dev branch. It is not production ready and has features slowly created. Do not use DEV branch!
 # Django AutoCTF
 This repo is broken up into 2 folders. One for the django application, and one for the database/server configurations.
 

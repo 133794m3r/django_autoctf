@@ -1,4 +1,5 @@
 #Programming Chals
+from collections import defaultdict
 from random import randint
 
 # RSA Flags
@@ -13,17 +14,17 @@ By Macarthur Inbody <admin-contact@transcendental.us>
 Licensed AGPLv3 Or later (2020)
 """
 def make_index(objects):
-	output = {}
+	output = defaultdict(list)
 	maximum = 0
 	for challenge in objects:
-		if challenge.category.name not in output:
-			output[challenge.category.name] = [challenge]
-			maximum +=1
-		else:
-			#i = categories.index(challenge.category.name)
-			output[challenge.category.name].append(challenge)
-
-	return output
+		# if challenge.category.name not in output:
+		# 	output[challenge.category.name] = [challenge]
+		# 	maximum +=1
+		# else:
+		# 	#i = categories.index(challenge.category.name)
+		output[challenge['category__name']].append(challenge)
+	#django can't handle default dict and the .items method in templates doesn't work
+	return dict(output)
 
 CHALLENGE_FUNCS = {
 	"fizzbuzz":make_fizzbuzz,

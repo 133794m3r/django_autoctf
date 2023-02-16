@@ -32,5 +32,5 @@ urlpatterns = [
 	path("leaderboard",views.leaderboard,name="leaderboard"),
 	path("top_secret",views.top_secret,name="top_secret"),
 	path("top_secret_test",views.top_secret_test,name="top_secret_test"),
-	path("admin/programming",views.programming_admin,name="programming_admin"),
+	path("admin/new_challenges",views.programming_admin,name="programming_admin"),
 ]
